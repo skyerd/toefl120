@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TF120</title>
+<meta name="description" content="新托福阅读长难句120句精析，涵盖同位语从句、定语从句、状语从句、倒装结构等核心句型。每句配有中文翻译、句子结构分析、详细语法解析和英语词源探析，助你攻克托福阅读长难句。">
+<meta name="keywords" content="托福120句,托福200句,托福100句,托福长难句,托福阅读,英语句子,句型分析,英语语法,同位语从句,定语从句,状语从句,倒装结构,英语词源,TOEFL,托福单词,托福备考">
+<meta name="author" content="托福120">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://xiaoyuehan.github.io/toefl120/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="托福120 · 长难句与词源">
+<meta property="og:description" content="新托福阅读长难句120句精析，每句配中文翻译、语法解析和词源探析，攻克托福阅读核心句型。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:site_name" content="托福120">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="托福120 · 长难句与词源">
+<meta name="twitter:description" content="新托福阅读长难句120句精析，每句配中文翻译、语法解析和词源探析。">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "托福120 · 长难句与词源",
+  "description": "新托福阅读长难句120句精析，涵盖同位语从句、定语从句、状语从句等核心句型，每句配中文翻译、语法解析和词源探析。",
+  "url": "https://xiaoyuehan.github.io/toefl120/",
+  "inLanguage": "zh-CN",
+  "genre": "Education"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "新托福阅读长难句120句精析",
+  "description": "120句托福阅读长难句，涵盖同位语从句、定语从句、状语从句、倒装结构等核心句型，配有中文翻译、语法解析和词源探析。",
+  "provider": {
+    "@type": "Organization",
+    "name": "托福120"
+  },
+  "inLanguage": "zh-CN",
+  "educationalLevel": "Advanced",
+  "learningResourceType": "PracticeProblem"
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+<aside class="sidebar" id="sidebar">
+<nav class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title" onclick="toggleNavSection(this)">
+<span>句子列表</span>
+<span class="nav-arrow">▾</span>
+</div>
+<div class="nav-section-items" id="sentence-nav"></div>
+</div>
+<div class="nav-section">
+<div class="nav-section-title" onclick="toggleNavSection(this)">
+<span>词源词典</span>
+<span class="nav-arrow">▾</span>
+</div>
+<div class="nav-section-items" id="etymology-nav"></div>
+</div>
+</nav>
+</aside>
+<main class="content" id="content">
+<div class="home-page" id="home-page">
+<div class="home-intro">
+<h1>新托福阅读长难句120句</h1>
+<p>分析 · 译文 · 词源探析</p>
+<p>本书收录了新托福阅读中的120句长难句，每句均配有中文翻译、句子结构分析和详细解析。此外，我们还为文中出现的高级词汇提供了来自 <a href="https://www.etymonline.com" target="_blank">Online Etymology Dictionary</a> 的词源介绍，帮助你从词根词源的角度深入理解单词含义。</p>
+<p>点击高亮单词可查看词源；双击任意英文单词，若词源库中有该词则显示词源，否则自动跳转至 <a href="https://www.etymonline.com" target="_blank">etymonline.com</a> 查询。</p>
+</div>
+<div class="home-section">
+<h2>语法结构速查</h2>
+<div class="structure-tags" id="structure-tags"></div>
+</div>
+<div class="home-section">
+<h2>开始学习</h2>
+<div class="sentence-list" id="sentence-cards"></div>
+</div>
+</div>
+<div class="sentence-page" id="sentence-page" style="display:none"></div>
+<div class="etymology-page" id="etymology-page" style="display:none"></div>
+</main>
+<button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
