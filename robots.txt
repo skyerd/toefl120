@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://xiaoyuehan.github.io/toefl120/sitemap.xml
+Sitemap: https://skyerd.github.io/toefl120/sitemap.xml

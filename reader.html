@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF阅读器 · TF120</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+body { overflow: hidden; }
+.reader-layout {
+  display: flex; height: 100vh; width: 100vw;
+}
+
+/* Sidebar */
+.reader-sidebar {
+  width: 220px; min-width: 220px;
+  border-right: 1px solid #E9ECEF;
+  display: flex; flex-direction: column;
+  background: var(--bg);
+  transition: margin-left 0.25s ease;
+}
+.reader-sidebar.collapsed { margin-left: -220px; }
+
+.sidebar-header {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid #E9ECEF;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.sidebar-title { font-size: 0.82rem; font-weight: 600; color: var(--fg); }
+.sidebar-close {
+  width: 24px; height: 24px; border: none; background: none;
+  cursor: pointer; color: var(--fg-secondary); display: flex;
+  align-items: center; justify-content: center; border-radius: 4px;
+}
+.sidebar-close:hover { background: #F1F3F5; color: var(--fg); }
+
+.sidebar-outline {
+  flex: 1; overflow-y: auto; padding: 8px 0;
+}
+.outline-item {
+  display: block; width: 100%; text-align: left;
+  padding: 6px 16px; font-size: 0.78rem; color: var(--fg-secondary);
+  border: none; background: none; cursor: pointer; font-family: inherit;
+  transition: background 0.1s ease, color 0.1s ease;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.outline-item:hover { background: #F1F3F5; color: var(--fg); }
+.outline-item.active { color: var(--accent); background: rgba(13,110,253,0.04); }
+.outline-item[data-level="2"] { padding-left: 28px; }
+.outline-item[data-level="3"] { padding-left: 40px; }
+
+.sidebar-pages {
+  border-top: 1px solid #E9ECEF; padding: 8px 0;
+  max-height: 200px; overflow-y: auto;
+}
+.page-jump {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 16px; font-size: 0.75rem; color: var(--fg-secondary);
+}
+.page-jump input {
+  width: 48px; height: 24px; border: 1px solid #DEE2E6;
+  border-radius: 4px; text-align: center; font-size: 0.75rem;
+  font-family: inherit; color: var(--fg); outline: none;
+}
+.page-jump input:focus { border-color: var(--accent); }
+
+/* Main area */
+.reader-main {
+  flex: 1; display: flex; flex-direction: column; overflow: hidden;
+}
+
+.reader-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 16px; border-bottom: 1px solid #E9ECEF;
+  background: var(--bg); flex-shrink: 0;
+}
+.toolbar-left { display: flex; align-items: center; gap: 10px; }
+.toolbar-right { display: flex; align-items: center; gap: 8px; }
+.reader-btn {
+  padding: 4px 10px; font-size: 0.75rem; border: 1px solid #E9ECEF;
+  border-radius: 4px; background: var(--bg); color: var(--fg-secondary);
+  cursor: pointer; font-family: inherit; transition: all 0.15s ease;
+}
+.reader-btn:hover { border-color: var(--accent); color: var(--accent); }
+.reader-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.doc-title { font-size: 0.82rem; font-weight: 500; color: var(--fg); max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Scroll container */
+.reader-scroll {
+  flex: 1; overflow-y: auto; background: #F8F9FA;
+  padding: 20px 0;
+}
+.reader-scroll canvas {
+  display: block; margin: 0 auto 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+/* Drop zone */
+.drop-zone {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: var(--bg); z-index: 10;
+}
+.drop-zone-box {
+  border: 2px dashed #DEE2E6; border-radius: 12px;
+  padding: 60px 48px; text-align: center;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  cursor: pointer;
+}
+.drop-zone-box:hover, .drop-zone-box.dragover {
+  border-color: var(--accent); background: rgba(13,110,253,0.03);
+}
+.drop-zone-icon { margin-bottom: 14px; color: var(--fg-secondary); }
+.drop-zone-text { font-size: 0.9rem; color: var(--fg-secondary); margin-bottom: 6px; }
+.drop-zone-hint { font-size: 0.75rem; color: #ADB5BD; }
+.drop-zone input[type="file"] { display: none; }
+
+.loading-overlay {
+  position: absolute; inset: 0; display: flex;
+  align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.9); z-index: 20;
+  font-size: 0.88rem; color: var(--fg-secondary);
+}
+
+@media (max-width: 700px) {
+  .reader-sidebar { position: fixed; z-index: 100; height: 100vh; box-shadow: 2px 0 8px rgba(0,0,0,0.1); }
+  .reader-sidebar.collapsed { margin-left: -220px; }
+}
+</style>
+</head>
+<body>
+<div class="reader-layout">
+  <!-- Sidebar -->
+  <div class="reader-sidebar collapsed" id="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-title">目录</span>
+      <button class="sidebar-close" onclick="toggleSidebar()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="sidebar-outline" id="outline"></div>
+    <div class="sidebar-pages">
+      <div class="page-jump">
+        <span>跳转到</span>
+        <input type="number" id="page-input" min="1" value="1" onkeydown="if(event.key==='Enter')jumpToPage()">
+        <span>/ <span id="total-pages">0</span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="reader-main">
+    <div class="reader-toolbar" id="toolbar" style="display:none">
+      <div class="toolbar-left">
+        <button class="reader-btn" onclick="toggleSidebar()" title="目录">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <span class="doc-title" id="doc-title"></span>
+      </div>
+      <div class="toolbar-right">
+        <button class="reader-btn" onclick="zoomOut()">-</button>
+        <span style="font-size:0.75rem;color:var(--fg-secondary);min-width:36px;text-align:center" id="zoom-level">100%</span>
+        <button class="reader-btn" onclick="zoomIn()">+</button>
+        <button class="reader-btn" onclick="location.href='reading.html'">书架</button>
+      </div>
+    </div>
+
+    <!-- Drop zone -->
+    <div class="drop-zone" id="drop-zone">
+      <div class="drop-zone-box" id="drop-box">
+        <div class="drop-zone-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+        </div>
+        <div class="drop-zone-text">拖拽PDF文件到此处，或点击选择文件</div>
+        <div class="drop-zone-hint">本地渲染，数据不会上传到任何服务器</div>
+        <input type="file" id="file-input" accept=".pdf">
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-overlay" id="loading" style="display:none">正在加载文档...</div>
+
+    <!-- Scroll container -->
+    <div class="reader-scroll" id="scroll-container"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+let pdfDoc = null;
+let totalPages = 0;
+let currentScale = 1.2;
+let pageCanvases = [];
+let outlineItems = [];
+
+// --- Drop zone ---
+const dropZone = document.getElementById('drop-zone');
+const dropBox = document.getElementById('drop-box');
+const fileInput = document.getElementById('file-input');
+
+dropBox.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => { if (e.target.files[0]) loadLocalPDF(e.target.files[0]); });
+dropBox.addEventListener('dragover', e => { e.preventDefault(); dropBox.classList.add('dragover'); });
+dropBox.addEventListener('dragleave', () => dropBox.classList.remove('dragover'));
+dropBox.addEventListener('drop', e => {
+  e.preventDefault(); dropBox.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type === 'application/pdf') loadLocalPDF(file);
+});
+
+// Also support drag on entire page
+document.addEventListener('dragover', e => e.preventDefault());
+document.addEventListener('drop', e => {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if (file && file.type === 'application/pdf') loadLocalPDF(file);
+});
+
+function loadLocalPDF(file) {
+  document.getElementById('doc-title').textContent = file.name.replace(/\.pdf$/i, '');
+  document.title = file.name.replace(/\.pdf$/i, '') + ' · TF120';
+  const reader = new FileReader();
+  reader.onload = function() { openPDF(new Uint8Array(this.result)); };
+  reader.readAsArrayBuffer(file);
+}
+
+// --- Online PDF ---
+const params = new URLSearchParams(location.search);
+const bookId = params.get('book');
+if (bookId) {
+  const BOOKS = [{ id:'tf120', title:'新托福阅读长难句120句', type:'html', url:'index.html' }];
+  // If needed, extend BOOKS from books.js
+}
+
+async function openPDF(source) {
+  document.getElementById('loading').style.display = '';
+  dropZone.style.display = 'none';
+
+  try {
+    pdfDoc = await pdfjsLib.getDocument(source).promise;
+    totalPages = pdfDoc.numPages;
+    document.getElementById('total-pages').textContent = totalPages;
+    document.getElementById('page-input').max = totalPages;
+    document.getElementById('toolbar').style.display = '';
+    document.getElementById('loading').style.display = 'none';
+
+    // Load outline
+    await loadOutline();
+    // Render all pages
+    await renderAllPages();
+  } catch (err) {
+    document.getElementById('loading').style.display = 'none';
+    dropZone.style.display = '';
+    dropBox.innerHTML = '<div style="color:#DC3545;font-size:0.88rem;">文档加载失败</div>';
+    console.error(err);
+  }
+}
+
+async function loadOutline() {
+  const outline = document.getElementById('outline');
+  outline.innerHTML = '';
+  try {
+    const pdfOutline = await pdfDoc.getOutline();
+    if (!pdfOutline || !pdfOutline.length) {
+      outline.innerHTML = '<div style="padding:12px 16px;font-size:0.75rem;color:#ADB5BD;">此PDF没有目录信息</div>';
+      return;
+    }
+    function renderItems(items, level) {
+      items.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'outline-item';
+        btn.setAttribute('data-level', level);
+        btn.textContent = item.title;
+        btn.onclick = () => goToOutlineItem(item);
+        outline.appendChild(btn);
+        if (item.items && item.items.length) renderItems(item.items, level + 1);
+      });
+    }
+    renderItems(pdfOutline, 1);
+    outlineItems = pdfOutline;
+  } catch (e) {
+    outline.innerHTML = '<div style="padding:12px 16px;font-size:0.75rem;color:#ADB5BD;">无法读取目录</div>';
+  }
+}
+
+async function goToOutlineItem(item) {
+  if (!item.dest) return;
+  try {
+    let dest = item.dest;
+    if (typeof dest === 'string') dest = await pdfDoc.getDestination(dest);
+    const ref = dest[0];
+    const pageIndex = await pdfDoc.getPageIndex(ref);
+    scrollToPage(pageIndex + 1);
+  } catch (e) { console.error(e); }
+}
+
+async function renderAllPages() {
+  const container = document.getElementById('scroll-container');
+  container.innerHTML = '';
+  pageCanvases = [];
+
+  for (let i = 1; i <= totalPages; i++) {
+    const page = await pdfDoc.getPage(i);
+    const viewport = page.getViewport({ scale: currentScale });
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    canvas.dataset.page = i;
+    canvas.style.maxWidth = '100%';
+    canvas.style.height = 'auto';
+    container.appendChild(canvas);
+    pageCanvases.push(canvas);
+    page.render({ canvasContext: canvas.getContext('2d'), viewport });
+  }
+
+  // Track scroll position to update current page
+  container.addEventListener('scroll', updateCurrentPage);
+}
+
+function updateCurrentPage() {
+  const container = document.getElementById('scroll-container');
+  const scrollTop = container.scrollTop;
+  let current = 1;
+  for (let i = 0; i < pageCanvases.length; i++) {
+    if (pageCanvases[i].offsetTop - 60 > scrollTop) break;
+    current = i + 1;
+  }
+  document.getElementById('page-input').value = current;
+  // Update outline active
+  document.querySelectorAll('.outline-item').forEach(el => el.classList.remove('active'));
+}
+
+function scrollToPage(num) {
+  if (num < 1 || num > totalPages) return;
+  const canvas = pageCanvases[num - 1];
+  if (canvas) {
+    const container = document.getElementById('scroll-container');
+    container.scrollTo({ top: canvas.offsetTop - 10, behavior: 'smooth' });
+  }
+}
+
+function jumpToPage() {
+  const num = parseInt(document.getElementById('page-input').value);
+  if (num >= 1 && num <= totalPages) scrollToPage(num);
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('collapsed');
+}
+
+function zoomIn() {
+  currentScale = Math.min(currentScale + 0.2, 3.0);
+  applyZoom();
+}
+function zoomOut() {
+  currentScale = Math.max(currentScale - 0.2, 0.4);
+  applyZoom();
+}
+async function applyZoom() {
+  document.getElementById('zoom-level').textContent = Math.round(currentScale / 1.2 * 100) + '%';
+  for (let i = 1; i <= totalPages; i++) {
+    const page = await pdfDoc.getPage(i);
+    const viewport = page.getViewport({ scale: currentScale });
+    const canvas = pageCanvases[i - 1];
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    page.render({ canvasContext: canvas.getContext('2d'), viewport });
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>阅读主站 · TF120</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+.reading-page { max-width: 680px; margin: 0 auto; padding: 80px 24px 120px; }
+.reading-header { text-align: center; margin-bottom: 48px; }
+.reading-header h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 4px; }
+.reading-header p { font-size: 0.88rem; color: var(--fg-secondary); letter-spacing: 1px; }
+
+.bookshelf {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 40px;
+}
+.book-card {
+  background: var(--bg-secondary);
+  border: 1px solid #E9ECEF;
+  border-radius: 8px;
+  padding: 16px 14px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.book-card:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(13,110,253,0.08); }
+.book-card-title {
+  font-size: 0.85rem; font-weight: 500; color: var(--fg);
+  line-height: 1.4;
+}
+.book-card-cat { font-size: 0.7rem; color: var(--accent); }
+.book-card-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: auto; }
+.book-card-tag { font-size: 0.65rem; color: var(--fg-secondary); background: var(--bg); padding: 1px 6px; border-radius: 3px; }
+
+.reader-entry {
+  border: 2px dashed #DEE2E6; border-radius: 12px;
+  padding: 40px 24px; text-align: center;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  cursor: pointer;
+}
+.reader-entry:hover { border-color: var(--accent); background: rgba(13,110,253,0.03); }
+.reader-entry-icon { margin-bottom: 10px; color: var(--fg-secondary); }
+.reader-entry-text { font-size: 0.88rem; color: var(--fg-secondary); margin-bottom: 4px; }
+.reader-entry-hint { font-size: 0.75rem; color: #ADB5BD; }
+
+.back-link {
+  display: inline-block; margin-bottom: 32px;
+  font-size: 0.85rem; color: var(--fg-secondary);
+  text-decoration: none; cursor: pointer;
+  transition: color 0.15s ease;
+}
+.back-link:hover { color: var(--accent); }
+
+.section-label {
+  font-size: 0.78rem; font-weight: 500; color: var(--fg-secondary);
+  margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;
+}
+
+@media (max-width: 600px) {
+  .bookshelf { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .reading-page { padding: 40px 16px 80px; }
+}
+</style>
+</head>
+<body>
+<div class="reading-page">
+  <a class="back-link" onclick="location.href='index.html'">← 返回</a>
+  <div class="reading-header">
+    <h1>阅读主站</h1>
+    <p>READ · LEARN · GROW</p>
+  </div>
+
+  <div class="section-label">课程</div>
+  <div class="bookshelf" id="bookshelf"></div>
+
+  <div class="section-label">PDF阅读器</div>
+  <div class="reader-entry" onclick="location.href='reader.html'">
+    <div class="reader-entry-icon">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+    </div>
+    <div class="reader-entry-text">打开本地PDF文件</div>
+    <div class="reader-entry-hint">拖拽或选择PDF，支持目录导航和连续滚动</div>
+  </div>
+</div>
+
+<script src="books.js"></script>
+<script>
+document.getElementById('bookshelf').innerHTML = BOOKS.map(b => `
+  <div class="book-card" onclick="location.href='${b.url}'">
+    <div class="book-card-cat">${b.category}</div>
+    <div class="book-card-title">${b.title}</div>
+    <div class="book-card-tags">${b.tags.map(t => `<span class="book-card-tag">${t}</span>`).join('')}</div>
+  </div>
+`).join('');
+</script>
+</body>
+</html>

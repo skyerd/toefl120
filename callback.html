@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>登录中...</title></head>
+<body style="display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:system-ui;color:#666">
+<script>
+  const params = new URLSearchParams(location.search);
+  const code = params.get('code');
+  if (code && window.opener) {
+    window.opener.postMessage({ type: 'github-oauth', code: code }, location.origin);
+    document.body.textContent = '登录成功，正在返回...';
+    setTimeout(() => window.close(), 1500);
+  } else {
+    document.body.textContent = '登录失败，请关闭此窗口重试。';
+  }
+</script>
+</body>
+</html>
