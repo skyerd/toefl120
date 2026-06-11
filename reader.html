@@ -642,10 +642,13 @@ async function goToOutlineItem(item) {
 }
 
 // --- Render pages ---
+let lastDevicePixelRatio = window.devicePixelRatio;
+
 async function renderAllPages() {
   const container = document.getElementById('scroll-container');
   container.innerHTML = '';
   pageCanvases = [];
+  lastDevicePixelRatio = window.devicePixelRatio;
 
   if (viewMode === 'spread') {
     await renderSpreadPages(container);
@@ -658,6 +661,21 @@ async function renderAllPages() {
   updateCurrentPage();
 }
 
+function getRenderScale() {
+  return currentScale * window.devicePixelRatio;
+}
+
+function setupHiDPICanvas(canvas, viewport) {
+  const dpr = window.devicePixelRatio;
+  canvas.width = Math.floor(viewport.width * dpr);
+  canvas.height = Math.floor(viewport.height * dpr);
+  canvas.style.width = Math.floor(viewport.width) + 'px';
+  canvas.style.height = Math.floor(viewport.height) + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
 async function renderSinglePages(container) {
   container.classList.remove('spread-mode');
   for (let i = 1; i <= totalPages; i++) {
@@ -668,21 +686,18 @@ async function renderSinglePages(container) {
     const page = await pdfDoc.getPage(i);
     const viewport = page.getViewport({ scale: currentScale });
     const canvas = document.createElement('canvas');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
     canvas.dataset.page = i;
-    canvas.style.maxWidth = '100%';
-    canvas.style.height = 'auto';
     canvas.style.display = 'block';
     canvas.style.margin = '0 auto 12px';
     canvas.style.boxShadow = '0 2px 8px rgba(0,0,0,0.18)';
     canvas.style.background = '#fff';
 
+    const ctx = setupHiDPICanvas(canvas, viewport);
     wrapper.appendChild(canvas);
     wrapper.appendChild(createPageIndicators(i));
     container.appendChild(wrapper);
     pageCanvases.push(canvas);
-    page.render({ canvasContext: canvas.getContext('2d'), viewport });
+    page.render({ canvasContext: ctx, viewport });
   }
 }
 
@@ -699,16 +714,13 @@ async function renderSpreadPages(container) {
     const leftPage = await pdfDoc.getPage(i);
     const leftVP = leftPage.getViewport({ scale: currentScale });
     const leftCanvas = document.createElement('canvas');
-    leftCanvas.width = leftVP.width;
-    leftCanvas.height = leftVP.height;
     leftCanvas.dataset.page = i;
-    leftCanvas.style.maxWidth = '100%';
-    leftCanvas.style.height = 'auto';
+    const leftCtx = setupHiDPICanvas(leftCanvas, leftVP);
     leftWrapper.appendChild(leftCanvas);
     leftWrapper.appendChild(createPageIndicators(i));
     row.appendChild(leftWrapper);
     pageCanvases.push(leftCanvas);
-    leftPage.render({ canvasContext: leftCanvas.getContext('2d'), viewport: leftVP });
+    leftPage.render({ canvasContext: leftCtx, viewport: leftVP });
 
     // Right page (even) if exists
     if (i + 1 <= totalPages) {
@@ -718,21 +730,30 @@ async function renderSpreadPages(container) {
       const rightPage = await pdfDoc.getPage(i + 1);
       const rightVP = rightPage.getViewport({ scale: currentScale });
       const rightCanvas = document.createElement('canvas');
-      rightCanvas.width = rightVP.width;
-      rightCanvas.height = rightVP.height;
       rightCanvas.dataset.page = i + 1;
-      rightCanvas.style.maxWidth = '100%';
-      rightCanvas.style.height = 'auto';
+      const rightCtx = setupHiDPICanvas(rightCanvas, rightVP);
       rightWrapper.appendChild(rightCanvas);
       rightWrapper.appendChild(createPageIndicators(i + 1));
       row.appendChild(rightWrapper);
       pageCanvases.push(rightCanvas);
-      rightPage.render({ canvasContext: rightCanvas.getContext('2d'), viewport: rightVP });
+      rightPage.render({ canvasContext: rightCtx, viewport: rightVP });
     }
 
     container.appendChild(row);
   }
 }
+
+// Re-render when browser zoom changes
+let zoomRerenderTimer = null;
+window.addEventListener('resize', function() {
+  if (!pdfDoc) return;
+  const newRatio = window.devicePixelRatio;
+  if (newRatio !== lastDevicePixelRatio) {
+    lastDevicePixelRatio = newRatio;
+    clearTimeout(zoomRerenderTimer);
+    zoomRerenderTimer = setTimeout(function() { renderAllPages(); }, 200);
+  }
+});
 
 function createPageIndicators(pageNum) {
   const indicators = document.createElement('div');

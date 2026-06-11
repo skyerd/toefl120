@@ -731,13 +731,93 @@ body {
   .notes-panel { width: 100%; }
 }
 
+/* CET6 Word List Styles */
+.letter-group {
+  margin-bottom: 24px;
+}
+.letter-header {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--accent);
+  padding: 8px 0 6px;
+  border-bottom: 1px solid #E9ECEF;
+  margin-bottom: 4px;
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 10;
+}
+.letter-words {
+  display: flex;
+  flex-direction: column;
+}
+.word-item {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 6px 0;
+  cursor: pointer;
+  border-bottom: 1px solid #F8F9FA;
+  transition: background 0.15s ease;
+}
+.word-item:hover {
+  background: rgba(13, 110, 253, 0.03);
+}
+.word-item-word {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--fg);
+  min-width: 140px;
+  flex-shrink: 0;
+}
+.word-item-meaning {
+  font-size: 0.85rem;
+  color: var(--fg-secondary);
+  line-height: 1.6;
+}
+
+/* CET6 Word Detail Page */
+.word-title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 40px;
+  color: var(--fg);
+}
+.word-section {
+  margin-bottom: 36px;
+}
+.word-section-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--fg-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+.word-meaning-detail {
+  font-size: 1.05rem;
+  line-height: 1.9;
+  color: var(--fg);
+}
+
+@media (max-width: 600px) {
+  .word-item {
+    flex-direction: column;
+    gap: 2px;
+  }
+  .word-item-word {
+    min-width: auto;
+  }
+  .word-title { font-size: 1.5rem; }
+}
+
 /* Interactive controls: prevent text selection per WCAG best practice */
 button, .nav-btn, .nav-item, .rail-icon, .sidebar-toggle,
 .pomo-btn, .pomo-preset, .notes-close, .notes-login-btn,
 .notes-submit, .note-like-btn, .back-btn, .structure-tag,
 .word-highlight, .sentence-card, .etymology-sentence-item,
 .login-modal-btn, .login-modal-cancel, .login-modal-confirm,
-.nav-section-title, .pomodoro-timer {
+.nav-section-title, .pomodoro-timer, .word-item {
   -webkit-user-select: none;
   user-select: none;
 }

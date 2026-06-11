@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CET6 选词填空 · 核心词汇</title>
+<meta name="description" content="CET6六级选词填空14-25年核心词汇总结，830+高频词汇及释义，助你攻克六级选词填空。">
+<meta name="keywords" content="CET6,六级,选词填空,六级词汇,英语六级,六级备考,六级单词">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+<aside class="sidebar" id="sidebar">
+<nav class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title" onclick="toggleNavSection(this)">
+<span>导航</span>
+<span class="nav-arrow">▾</span>
+</div>
+<div class="nav-section-items">
+<div class="nav-item" onclick="location.href='index.html'">托福120句</div>
+<div class="nav-item active" onclick="showHome()">CET6选词填空</div>
+</div>
+</div>
+<div class="nav-section">
+<div class="nav-section-title" onclick="toggleNavSection(this)">
+<span>字母索引</span>
+<span class="nav-arrow">▾</span>
+</div>
+<div class="nav-section-items" id="letter-nav"></div>
+</div>
+<div class="nav-section">
+<div class="nav-section-title" onclick="toggleNavSection(this)">
+<span>词汇列表</span>
+<span class="nav-arrow">▾</span>
+</div>
+<div class="nav-section-items" id="word-nav"></div>
+</div>
+</nav>
+</aside>
+<main class="content" id="content">
+<div class="home-page" id="home-page">
+<div class="home-intro">
+<h1>CET6 选词填空核心词汇</h1>
+<p>2014–2025年真题 · 830+ 高频词</p>
+<p>本页汇总了2014年至2025年CET6六级选词填空真题中出现的核心词汇，按字母顺序排列，每个词均配有词性标注和中文释义。点击左侧字母索引可快速跳转，点击单词可查看详情。</p>
+</div>
+<div class="home-section">
+<h2>字母速查</h2>
+<div class="structure-tags" id="letter-tags"></div>
+</div>
+<div class="home-section">
+<h2>全部词汇</h2>
+<div class="word-list" id="word-list"></div>
+</div>
+</div>
+<div class="word-page" id="word-page" style="display:none"></div>
+</main>
+<button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+
+<div class="rail-edge" id="rail-edge"></div>
+<div class="float-rail" id="float-rail">
+    <div class="rail-icon" onclick="location.href='index.html'" title="托福120句">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+    </div>
+    <div class="rail-icon" onclick="location.href='reading.html'" title="阅读主站">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+    </div>
+    <div class="rail-icon" onclick="location.href='company.html'" title="公司主站">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+</div>
+</div>
+<script src="cet6_data.js"></script>
+<script src="cet6_app.js"></script>
+</body>
+</html>
