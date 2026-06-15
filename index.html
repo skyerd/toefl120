@@ -3,186 +3,593 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TF120</title>
-<meta name="baidu-site-verification" content="codeva-OR1aKKLs3T" />
-<meta name="description" content="新托福阅读长难句120句精析，涵盖同位语从句、定语从句、状语从句、倒装结构等核心句型。每句配有中文翻译、句子结构分析、详细语法解析和英语词源探析，助你攻克托福阅读长难句。">
-<meta name="keywords" content="托福120句,托福200句,托福100句,托福长难句,托福阅读,英语句子,句型分析,英语语法,同位语从句,定语从句,状语从句,倒装结构,英语词源,TOEFL,托福单词,托福备考">
-<meta name="author" content="托福120">
-<meta name="robots" content="index, follow">
-<link rel="canonical" href="https://skyerd.github.io/toefl120/">
-<meta property="og:type" content="website">
-<meta property="og:title" content="托福120 · 长难句与词源">
-<meta property="og:description" content="新托福阅读长难句120句精析，每句配中文翻译、语法解析和词源探析，攻克托福阅读核心句型。">
-<meta property="og:locale" content="zh_CN">
-<meta property="og:site_name" content="托福120">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="托福120 · 长难句与词源">
-<meta name="twitter:description" content="新托福阅读长难句120句精析，每句配中文翻译、语法解析和词源探析。">
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "托福120 · 长难句与词源",
-  "description": "新托福阅读长难句120句精析，涵盖同位语从句、定语从句、状语从句等核心句型，每句配中文翻译、语法解析和词源探析。",
-  "url": "https://skyerd.github.io/toefl120/",
-  "inLanguage": "zh-CN",
-  "genre": "Education"
-}
-</script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Course",
-  "name": "新托福阅读长难句120句精析",
-  "description": "120句托福阅读长难句，涵盖同位语从句、定语从句、状语从句、倒装结构等核心句型，配有中文翻译、语法解析和词源探析。",
-  "provider": {
-    "@type": "Organization",
-    "name": "托福120"
-  },
-  "inLanguage": "zh-CN",
-  "educationalLevel": "Advanced",
-  "learningResourceType": "PracticeProblem"
-}
-</script>
+<title>阅读主站 · TF120</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<style>
+.reading-page { max-width: 680px; margin: 0 auto; padding: 80px 24px 120px; }
+.reading-header { text-align: center; margin-bottom: 48px; }
+.reading-header h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 4px; }
+.reading-header p { font-size: 0.88rem; color: var(--fg-secondary); letter-spacing: 1px; }
+
+.bookshelf {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 40px;
+}
+.book-card {
+  background: var(--bg-secondary);
+  border: 1px solid #E9ECEF;
+  border-radius: 8px;
+  padding: 16px 14px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.book-card:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(13,110,253,0.08); }
+.book-card-title {
+  font-size: 0.85rem; font-weight: 500; color: var(--fg);
+  line-height: 1.4;
+}
+.book-card-cat { font-size: 0.7rem; color: var(--accent); }
+.book-card-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: auto; }
+.book-card-tag { font-size: 0.65rem; color: var(--fg-secondary); background: var(--bg); padding: 1px 6px; border-radius: 3px; }
+
+.reader-entry {
+  border: 2px dashed #DEE2E6; border-radius: 12px;
+  padding: 40px 24px; text-align: center;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  cursor: pointer;
+}
+.reader-entry:hover { border-color: var(--accent); background: rgba(13,110,253,0.03); }
+.reader-entry-icon { margin-bottom: 10px; color: var(--fg-secondary); }
+.reader-entry-text { font-size: 0.88rem; color: var(--fg-secondary); margin-bottom: 4px; }
+.reader-entry-hint { font-size: 0.75rem; color: #ADB5BD; }
+
+.back-link {
+  display: inline-block; margin-bottom: 32px;
+  font-size: 0.85rem; color: var(--fg-secondary);
+  text-decoration: none; cursor: pointer;
+  transition: color 0.15s ease;
+}
+.back-link:hover { color: var(--accent); }
+
+.section-label {
+  font-size: 0.78rem; font-weight: 500; color: var(--fg-secondary);
+  margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;
+}
+
+/* ── Sidebars ── */
+.reading-sidebar {
+  position: fixed;
+  top: 0;
+  width: 280px;
+  height: 100vh;
+  background: var(--bg);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease;
+}
+.reading-sidebar-left {
+  left: 0;
+  transform: translateX(-100%);
+  border-right: 1px solid #E9ECEF;
+  box-shadow: 2px 0 12px rgba(0,0,0,0.06);
+}
+.reading-sidebar-left.open {
+  transform: translateX(0);
+}
+.reading-sidebar-right {
+  right: 0;
+  transform: translateX(100%);
+  border-left: 1px solid #E9ECEF;
+  box-shadow: -2px 0 12px rgba(0,0,0,0.06);
+}
+.reading-sidebar-right.open {
+  transform: translateX(0);
+}
+.reading-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #E9ECEF;
+  flex-shrink: 0;
+}
+.reading-sidebar-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--fg);
+}
+.reading-sidebar-close {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--fg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+.reading-sidebar-close:hover {
+  background: #F1F3F5;
+  color: var(--fg);
+}
+.reading-sidebar-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 0;
+}
+
+/* ── Sidebar overlay (mobile) ── */
+.reading-sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.2);
+  z-index: 195;
+  display: none;
+}
+.reading-sidebar-overlay.visible {
+  display: block;
+}
+
+/* ── Toggle buttons ── */
+.reading-sidebar-toggle {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 48px;
+  background: var(--bg);
+  border: 1px solid #E9ECEF;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fg-secondary);
+  transition: all 0.15s ease;
+  z-index: 190;
+}
+.reading-sidebar-toggle:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.reading-sidebar-toggle-left {
+  left: 0;
+  border-radius: 0 6px 6px 0;
+  border-left: none;
+}
+.reading-sidebar-toggle-right {
+  right: 0;
+  border-radius: 6px 0 0 6px;
+  border-right: none;
+}
+.reading-sidebar-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ── History items ── */
+.history-item {
+  padding: 12px 20px;
+  border-bottom: 1px solid #F8F9FA;
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+.history-item:hover {
+  background: #F8F9FA;
+}
+.history-item-title {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--fg);
+  margin-bottom: 4px;
+}
+.history-item-stats {
+  display: flex;
+  gap: 12px;
+}
+.history-item-stat {
+  font-size: 0.72rem;
+  color: var(--fg-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.history-item-stat svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+.history-empty {
+  padding: 24px 20px;
+  text-align: center;
+  font-size: 0.82rem;
+  color: #ADB5BD;
+}
+
+/* ── Tracking sections ── */
+.tracking-section {
+  padding: 12px 20px;
+}
+.tracking-section + .tracking-section {
+  border-top: 1px solid #F8F9FA;
+}
+.tracking-section-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--fg-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.tracking-section-title svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+.tracking-item {
+  padding: 6px 0;
+  font-size: 0.82rem;
+  color: var(--fg);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.tracking-item:hover {
+  color: var(--accent);
+}
+.tracking-item-sub {
+  font-size: 0.72rem;
+  color: var(--fg-secondary);
+}
+.tracking-empty {
+  font-size: 0.78rem;
+  color: #ADB5BD;
+  padding: 4px 0;
+}
+.tracking-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  padding: 1px 5px;
+  border-radius: 3px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+.tracking-badge-error {
+  background: rgba(240,62,62,0.1);
+  color: #F03E3E;
+}
+.tracking-badge-warn {
+  background: rgba(245,159,0,0.1);
+  color: #F59F00;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .bookshelf { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .reading-page { padding: 40px 16px 80px; }
+  .reading-sidebar { width: 260px; }
+}
+</style>
 </head>
 <body>
-<div class="app">
-<aside class="sidebar" id="sidebar">
-<nav class="sidebar-nav">
-<div class="nav-section">
-<div class="nav-section-title" onclick="toggleNavSection(this)">
-<span>导航</span>
-<span class="nav-arrow">▾</span>
-</div>
-<div class="nav-section-items">
-<div class="nav-item active" onclick="showHome()">托福120句</div>
-<div class="nav-item" onclick="location.href='cet6.html'">CET6选词填空</div>
-</div>
-</div>
-<div class="nav-section">
-<div class="nav-section-title" onclick="toggleNavSection(this)">
-<span>句子列表</span>
-<span class="nav-arrow">▾</span>
-</div>
-<div class="nav-section-items" id="sentence-nav"></div>
-</div>
-<div class="nav-section">
-<div class="nav-section-title" onclick="toggleNavSection(this)">
-<span>词源词典</span>
-<span class="nav-arrow">▾</span>
-</div>
-<div class="nav-section-items" id="etymology-nav"></div>
-</div>
-</nav>
-</aside>
-<main class="content" id="content">
-<div class="home-page" id="home-page">
-<div class="home-intro">
-<h1>新托福阅读长难句120句</h1>
-<p>分析 · 译文 · 词源探析</p>
-<p>本书收录了新托福阅读中的120句长难句，每句均配有中文翻译、句子结构分析和详细解析。此外，我们还为文中出现的高级词汇提供了来自 <a href="https://www.etymonline.com" target="_blank">Online Etymology Dictionary</a> 的词源介绍，帮助你从词根词源的角度深入理解单词含义。</p>
-<p>点击高亮单词可查看词源；双击任意英文单词，若词源库中有该词则显示词源，否则自动跳转至 <a href="https://www.etymonline.com" target="_blank">etymonline.com</a> 查询。</p>
-</div>
-<div class="home-section">
-<h2>语法结构速查</h2>
-<div class="structure-tags" id="structure-tags"></div>
-</div>
-<div class="home-section">
-<h2>开始学习</h2>
-<div class="sentence-list" id="sentence-cards"></div>
-</div>
-</div>
-<div class="sentence-page" id="sentence-page" style="display:none"></div>
-<div class="etymology-page" id="etymology-page" style="display:none"></div>
-</main>
-<button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()">☰</button>
 
-<div class="rail-edge" id="rail-edge"></div>
-<div class="float-rail" id="float-rail">
-    <div class="rail-icon" onclick="location.href='cet6.html'" title="CET6选词填空">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
-    </div>
-    <div class="rail-icon" onclick="location.href='reading.html'" title="阅读主站">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
-    </div>
-    <div class="rail-icon" onclick="showNotes()" title="笔记">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-    </div>
-    <div class="rail-icon" onclick="showRepo()" title="共享仓库">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-    </div>
-    <div class="rail-icon" onclick="showPomodoroModal()" title="番茄钟">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-    </div>
-    <div class="rail-icon" onclick="location.href='company.html'" title="公司主站">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    </div>
-</div>
+<!-- Left sidebar toggle -->
+<button class="reading-sidebar-toggle reading-sidebar-toggle-left" onclick="toggleReadingSidebar('left')" title="阅读历史">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+  </svg>
+</button>
 
-<div class="pomodoro-timer" id="pomodoro-timer" style="display:none" onclick="showPomodoroModal()">
-  <span id="pomodoro-display">25:00</span>
-</div>
+<!-- Right sidebar toggle -->
+<button class="reading-sidebar-toggle reading-sidebar-toggle-right" onclick="toggleReadingSidebar('right')" title="学习追踪">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>
+  </svg>
+</button>
 
-<!-- Notes Panel -->
-<div class="notes-panel" id="notes-panel">
-  <div class="notes-header">
-    <button class="notes-close" onclick="closeNotes()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-    <span class="notes-title">笔记</span>
-    <button class="notes-login-btn" id="notes-login-btn" onclick="loginGitHub()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-      <span id="login-btn-text">登录</span>
+<!-- Overlay for mobile -->
+<div class="reading-sidebar-overlay" id="reading-sidebar-overlay" onclick="closeReadingSidebars()"></div>
+
+<!-- Left sidebar: 阅读历史 -->
+<div class="reading-sidebar reading-sidebar-left" id="reading-sidebar-left">
+  <div class="reading-sidebar-header">
+    <span class="reading-sidebar-title">阅读历史</span>
+    <button class="reading-sidebar-close" onclick="toggleReadingSidebar('left')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
   </div>
-  <div class="notes-logged-in" id="notes-logged-in" style="display:none">
-    <img class="notes-avatar" id="notes-avatar" src="" alt="">
-    <span class="notes-username" id="notes-username"></span>
+  <div class="reading-sidebar-body" id="reading-history-list"></div>
+</div>
+
+<!-- Right sidebar: 学习追踪 -->
+<div class="reading-sidebar reading-sidebar-right" id="reading-sidebar-right">
+  <div class="reading-sidebar-header">
+    <span class="reading-sidebar-title">学习追踪</span>
+    <button class="reading-sidebar-close" onclick="toggleReadingSidebar('right')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
   </div>
-  <div class="notes-context" id="notes-context" style="display:none">
-    <div class="notes-context-label">选中段落</div>
-    <div class="notes-context-text" id="notes-context-text"></div>
+  <div class="reading-sidebar-body" id="reading-tracking-list"></div>
+</div>
+
+<!-- Main content -->
+<div class="reading-page">
+  <a class="back-link" onclick="location.href='company.html'">← 返回</a>
+  <div class="reading-header">
+    <h1>阅读主站</h1>
+    <p>READ · LEARN · GROW</p>
   </div>
-  <div class="notes-input-wrap" id="notes-input-wrap" style="display:none">
-    <textarea class="notes-input" id="notes-input" placeholder="写下你的笔记..." rows="3"></textarea>
-    <button class="notes-submit" onclick="submitNote()">发布</button>
-  </div>
-  <div class="notes-list" id="notes-list">
-    <div class="notes-empty" id="notes-empty">Ctrl+双击 或 长按段落添加笔记</div>
+
+  <div class="section-label">课程</div>
+  <div class="bookshelf" id="bookshelf"></div>
+
+  <div class="section-label">文档阅读器</div>
+  <div class="reader-entry" onclick="location.href='reader/'">
+    <div class="reader-entry-icon">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+    </div>
+    <div class="reader-entry-text">打开本地文档</div>
+    <div class="reader-entry-hint">支持 PDF、DOCX、TXT、Markdown、HTML 等格式，本地渲染不上传</div>
   </div>
 </div>
 
-<div class="modal-overlay" id="pomodoro-modal" style="display:none" onclick="if(event.target===this)closePomodoroModal()">
-  <div class="modal-box pomo-modal">
-    <div class="pomo-clock-wrap">
-      <svg class="pomo-clock" viewBox="0 0 200 200" id="pomo-clock-svg">
-        <circle cx="100" cy="100" r="90" fill="none" stroke="#E9ECEF" stroke-width="2"/>
-        <circle cx="100" cy="100" r="78" fill="none" stroke="#F8F9FA" stroke-width="1"/>
-        <!-- tick marks & numbers drawn by JS -->
-        <g id="pomo-ticks"></g>
-        <line id="pomo-hand" x1="100" y1="100" x2="100" y2="30" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" transform="rotate(0,100,100)"/>
-        <circle cx="100" cy="100" r="5" fill="var(--accent)"/>
-        <circle cx="100" cy="100" r="2" fill="#fff"/>
-      </svg>
-      <div class="pomo-clock-label" id="pomo-clock-label">25 min</div>
-    </div>
-    <div class="pomodoro-presets">
-      <button class="pomo-preset active" data-min="25" onclick="selectPreset(this,25)">25</button>
-      <button class="pomo-preset" data-min="30" onclick="selectPreset(this,30)">30</button>
-      <button class="pomo-preset" data-min="45" onclick="selectPreset(this,45)">45</button>
-      <button class="pomo-preset" data-min="60" onclick="selectPreset(this,60)">60</button>
-    </div>
-    <div class="pomodoro-actions">
-      <button class="pomo-btn pomo-start" onclick="startPomodoro()">开始</button>
-      <button class="pomo-btn pomo-cancel" onclick="stopPomodoro();closePomodoroModal()">取消</button>
-    </div>
-  </div>
-</div>
-<script src="data.js"></script>
-<script src="app.js"></script>
+<script src="books.js"></script>
+<script>
+/* ── Sidebar toggle ── */
+function toggleReadingSidebar(side) {
+  var el = document.getElementById('reading-sidebar-' + side);
+  var overlay = document.getElementById('reading-sidebar-overlay');
+  var isOpen = el.classList.contains('open');
+  closeReadingSidebars();
+  if (!isOpen) {
+    el.classList.add('open');
+    overlay.classList.add('visible');
+  }
+}
+function closeReadingSidebars() {
+  document.getElementById('reading-sidebar-left').classList.remove('open');
+  document.getElementById('reading-sidebar-right').classList.remove('open');
+  document.getElementById('reading-sidebar-overlay').classList.remove('visible');
+}
+
+/* ── Reading history tracking ── */
+var HISTORY_KEY = 'reading_history';
+
+function getReadingHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || {}; }
+  catch(e) { return {}; }
+}
+function saveReadingHistory(data) {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(data));
+}
+
+function formatDuration(ms) {
+  if (ms < 60000) return Math.round(ms / 1000) + '秒';
+  if (ms < 3600000) return Math.round(ms / 60000) + '分钟';
+  var h = Math.floor(ms / 3600000);
+  var m = Math.round((ms % 3600000) / 60000);
+  return h + '小时' + (m > 0 ? m + '分' : '');
+}
+
+// On page load, check if returning from a book and record time spent
+(function recordTimeSpent() {
+  var now = Date.now();
+  var history = getReadingHistory();
+  BOOKS.forEach(function(book) {
+    var startKey = 'reading_start_' + book.id;
+    var startStr = sessionStorage.getItem(startKey);
+    if (startStr) {
+      var start = parseInt(startStr, 10);
+      var elapsed = now - start;
+      if (elapsed > 0 && elapsed < 86400000) { // cap at 24h to avoid absurd values
+        if (!history[book.id]) {
+          history[book.id] = { visits: 0, totalTime: 0, lastVisit: 0, yesterdayTime: 0 };
+        }
+        history[book.id].visits++;
+        history[book.id].totalTime += elapsed;
+        history[book.id].lastVisit = now;
+        // Track yesterday's time: if the visit started within the last 24-48 hours
+        var hoursAgo = (now - start) / 3600000;
+        if (hoursAgo < 24) {
+          history[book.id].yesterdayTime = (history[book.id].yesterdayTime || 0) + elapsed;
+        }
+      }
+      sessionStorage.removeItem(startKey);
+    }
+  });
+  saveReadingHistory(history);
+})();
+
+/* ── Render book cards ── */
+document.getElementById('bookshelf').innerHTML = BOOKS.map(function(b) {
+  return '<div class="book-card" data-book-id="' + b.id + '" data-book-url="' + b.url + '">' +
+    '<div class="book-card-cat">' + b.category + '</div>' +
+    '<div class="book-card-title">' + b.title + '</div>' +
+    '<div class="book-card-tags">' + b.tags.map(function(t) { return '<span class="book-card-tag">' + t + '</span>'; }).join('') + '</div>' +
+  '</div>';
+}).join('');
+
+document.getElementById('bookshelf').addEventListener('click', function(e) {
+  var card = e.target.closest('.book-card');
+  if (!card) return;
+  var bookId = card.getAttribute('data-book-id');
+  var bookUrl = card.getAttribute('data-book-url');
+  // Record start timestamp
+  sessionStorage.setItem('reading_start_' + bookId, String(Date.now()));
+  sessionStorage.setItem('from_reading', '1');
+  // Navigate
+  location.href = bookUrl;
+});
+
+/* ── Render left sidebar: reading history ── */
+function renderReadingHistory() {
+  var container = document.getElementById('reading-history-list');
+  var history = getReadingHistory();
+  var items = BOOKS.filter(function(b) { return history[b.id]; });
+
+  if (items.length === 0) {
+    container.innerHTML = '<div class="history-empty">暂无阅读记录</div>';
+    return;
+  }
+
+  // Sort by lastVisit descending
+  items.sort(function(a, b) { return (history[b.id].lastVisit || 0) - (history[a.id].lastVisit || 0); });
+
+  container.innerHTML = items.map(function(book) {
+    var h = history[book.id];
+    var avgTime = h.visits > 0 ? h.totalTime / h.visits : 0;
+    return '<div class="history-item" onclick="location.href=\'' + book.url + '\'">' +
+      '<div class="history-item-title">' + book.title + '</div>' +
+      '<div class="history-item-stats">' +
+        '<span class="history-item-stat">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
+          '平均 ' + formatDuration(avgTime) +
+        '</span>' +
+        '<span class="history-item-stat">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>' +
+          '昨日 ' + formatDuration(h.yesterdayTime || 0) +
+        '</span>' +
+        '<span class="history-item-stat">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>' +
+          h.visits + '次' +
+        '</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+/* ── Render right sidebar: tracking ── */
+function renderReadingTracking() {
+  var container = document.getElementById('reading-tracking-list');
+  var now = Date.now();
+  var DAY = 86400000;
+  var WEEK = 7 * DAY;
+  var html = '';
+
+  // 1. 最近标签
+  var history = getReadingHistory();
+  var recentTags = [];
+  var staleTags = [];
+  var allTags = {};
+
+  BOOKS.forEach(function(book) {
+    book.tags.forEach(function(tag) {
+      if (!allTags[tag]) allTags[tag] = { lastVisit: 0, books: [] };
+      allTags[tag].books.push(book);
+      if (history[book.id] && history[book.id].lastVisit) {
+        if (history[book.id].lastVisit > allTags[tag].lastVisit) {
+          allTags[tag].lastVisit = history[book.id].lastVisit;
+        }
+      }
+    });
+  });
+
+  Object.keys(allTags).forEach(function(tag) {
+    if (allTags[tag].lastVisit > 0 && (now - allTags[tag].lastVisit) < WEEK) {
+      recentTags.push(tag);
+    } else if (allTags[tag].lastVisit > 0) {
+      staleTags.push(tag);
+    }
+  });
+
+  // Recent tags section
+  html += '<div class="tracking-section">';
+  html += '<div class="tracking-section-title">' +
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>' +
+    '最近标签</div>';
+  if (recentTags.length > 0) {
+    recentTags.forEach(function(tag) {
+      html += '<div class="tracking-item">' + tag + '</div>';
+    });
+  } else {
+    html += '<div class="tracking-empty">暂无最近标签</div>';
+  }
+  html += '</div>';
+
+  // Stale tags section
+  html += '<div class="tracking-section">';
+  html += '<div class="tracking-section-title">' +
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+    '很久没看的标签</div>';
+  if (staleTags.length > 0) {
+    staleTags.forEach(function(tag) {
+      html += '<div class="tracking-item">' + tag +
+        '<span class="tracking-badge tracking-badge-warn">7天+</span></div>';
+    });
+  } else {
+    html += '<div class="tracking-empty">所有标签都在活跃中</div>';
+  }
+  html += '</div>';
+
+  // 2. Error words from CET6
+  var cet6Data = null;
+  try { cet6Data = JSON.parse(localStorage.getItem('cet6_progress')); } catch(e) {}
+
+  var frequentErrors = [];
+  var recentErrors = [];
+
+  if (cet6Data && typeof cet6Data === 'object') {
+    Object.keys(cet6Data).forEach(function(word) {
+      var entry = cet6Data[word];
+      if (!entry || typeof entry !== 'object') return;
+      var wrong = entry.wrong || 0;
+      var lastStudied = entry.lastStudied || 0;
+
+      if (wrong > 3) {
+        frequentErrors.push({ word: word, wrong: wrong });
+      }
+      if (wrong > 0 && lastStudied > 0 && (now - lastStudied) < DAY) {
+        recentErrors.push({ word: word, wrong: wrong });
+      }
+    });
+  }
+
+  // Frequent errors section
+  html += '<div class="tracking-section">';
+  html += '<div class="tracking-section-title">' +
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' +
+    '经常错误的单词</div>';
+  if (frequentErrors.length > 0) {
+    frequentErrors.forEach(function(item) {
+      html += '<div class="tracking-item">' + item.word +
+        '<span class="tracking-badge tracking-badge-error">错' + item.wrong + '次</span></div>';
+    });
+  } else {
+    html += '<div class="tracking-empty">暂无经常错误的单词</div>';
+  }
+  html += '</div>';
+
+  // Recent errors section
+  html += '<div class="tracking-section">';
+  html += '<div class="tracking-section-title">' +
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
+    '刚刚错误的单词</div>';
+  if (recentErrors.length > 0) {
+    recentErrors.forEach(function(item) {
+      html += '<div class="tracking-item">' + item.word +
+        '<span class="tracking-badge tracking-badge-warn">错' + item.wrong + '次</span></div>';
+    });
+  } else {
+    html += '<div class="tracking-empty">暂无最近错误</div>';
+  }
+  html += '</div>';
+
+  container.innerHTML = html;
+}
+
+/* ── Initialize ── */
+renderReadingHistory();
+renderReadingTracking();
+</script>
 </body>
 </html>
