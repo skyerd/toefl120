@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文档阅读器 · TF120</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<style>
+body { overflow: hidden; }
+.reader-layout {
+  display: flex; height: 100vh; width: 100vw;
+}
+
+/* Sidebar */
+.reader-sidebar {
+  width: 240px; min-width: 240px;
+  border-right: 1px solid #E9ECEF;
+  display: flex; flex-direction: column;
+  background: var(--bg);
+  transition: margin-left 0.25s ease;
+}
+.reader-sidebar.collapsed { margin-left: -240px; }
+
+.sidebar-header {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid #E9ECEF;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.sidebar-title { font-size: 0.82rem; font-weight: 600; color: var(--fg); }
+.sidebar-close {
+  width: 24px; height: 24px; border: none; background: none;
+  cursor: pointer; color: var(--fg-secondary); display: flex;
+  align-items: center; justify-content: center; border-radius: 4px;
+}
+.sidebar-close:hover { background: #F1F3F5; color: var(--fg); }
+
+/* Sidebar tabs */
+.sidebar-tabs {
+  display: flex; border-bottom: 1px solid #E9ECEF;
+}
+.sidebar-tab {
+  flex: 1; padding: 8px 0; font-size: 0.72rem; font-weight: 500;
+  color: var(--fg-secondary); background: none; border: none;
+  cursor: pointer; font-family: inherit; text-align: center;
+  border-bottom: 2px solid transparent; transition: all 0.15s ease;
+}
+.sidebar-tab:hover { color: var(--fg); }
+.sidebar-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.sidebar-panel { display: none; flex: 1; overflow-y: auto; }
+.sidebar-panel.active { display: flex; flex-direction: column; }
+
+.sidebar-outline {
+  flex: 1; overflow-y: auto; padding: 8px 0;
+}
+.outline-item {
+  display: block; width: 100%; text-align: left;
+  padding: 6px 16px; font-size: 0.78rem; color: var(--fg-secondary);
+  border: none; background: none; cursor: pointer; font-family: inherit;
+  transition: background 0.1s ease, color 0.1s ease;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.outline-item:hover { background: #F1F3F5; color: var(--fg); }
+.outline-item.active { color: var(--accent); background: rgba(13,110,253,0.04); }
+.outline-item[data-level="2"] { padding-left: 28px; }
+.outline-item[data-level="3"] { padding-left: 40px; }
+
+/* Bookmarks panel */
+.bookmark-list { padding: 8px 0; }
+.bookmark-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 16px; cursor: pointer; transition: background 0.1s ease;
+}
+.bookmark-item:hover { background: #F1F3F5; }
+.bookmark-icon { color: #F59F00; flex-shrink: 0; }
+.bookmark-info { flex: 1; min-width: 0; }
+.bookmark-page { font-size: 0.78rem; font-weight: 500; color: var(--fg); }
+.bookmark-note { font-size: 0.7rem; color: var(--fg-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bookmark-delete {
+  width: 20px; height: 20px; border: none; background: none;
+  cursor: pointer; color: #ADB5BD; display: flex; align-items: center;
+  justify-content: center; border-radius: 3px; flex-shrink: 0; opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.bookmark-item:hover .bookmark-delete { opacity: 1; }
+.bookmark-delete:hover { color: #DC3545; background: #FFF5F5; }
+.bookmarks-empty { padding: 24px 16px; text-align: center; font-size: 0.75rem; color: #ADB5BD; }
+
+/* Notes panel */
+.note-list { padding: 8px 0; }
+.note-item {
+  padding: 10px 16px; border-bottom: 1px solid #F1F3F5;
+  cursor: pointer; transition: background 0.1s ease;
+}
+.note-item:hover { background: #F8F9FA; }
+.note-item-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.note-page-badge {
+  font-size: 0.65rem; font-weight: 500; color: var(--accent);
+  background: rgba(13,110,253,0.06); padding: 1px 6px; border-radius: 3px;
+}
+.note-time { font-size: 0.65rem; color: #ADB5BD; }
+.note-text { font-size: 0.78rem; color: var(--fg); line-height: 1.5; word-break: break-word; }
+.note-delete {
+  float: right; width: 18px; height: 18px; border: none; background: none;
+  cursor: pointer; color: #ADB5BD; display: flex; align-items: center;
+  justify-content: center; border-radius: 3px; opacity: 0; transition: opacity 0.15s ease;
+}
+.note-item:hover .note-delete { opacity: 1; }
+.note-delete:hover { color: #DC3545; }
+.notes-empty { padding: 24px 16px; text-align: center; font-size: 0.75rem; color: #ADB5BD; }
+
+.sidebar-pages {
+  border-top: 1px solid #E9ECEF; padding: 8px 0;
+  max-height: 200px; overflow-y: auto;
+}
+.page-jump {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 16px; font-size: 0.75rem; color: var(--fg-secondary);
+}
+.page-jump input {
+  width: 48px; height: 24px; border: 1px solid #DEE2E6;
+  border-radius: 4px; text-align: center; font-size: 0.75rem;
+  font-family: inherit; color: var(--fg); outline: none;
+}
+.page-jump input:focus { border-color: var(--accent); }
+
+/* Main area */
+.reader-main {
+  flex: 1; display: flex; flex-direction: column; overflow: hidden;
+}
+
+.reader-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 12px; border-bottom: 1px solid #E9ECEF;
+  background: var(--bg); flex-shrink: 0;
+}
+.toolbar-left { display: flex; align-items: center; gap: 6px; }
+.toolbar-center { display: flex; align-items: center; gap: 4px; }
+.toolbar-right { display: flex; align-items: center; gap: 6px; }
+
+.tool-btn {
+  width: 32px; height: 32px; border: 1px solid transparent;
+  border-radius: 6px; background: none; color: var(--fg-secondary);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s ease; padding: 0;
+}
+.tool-btn:hover { background: #F1F3F5; color: var(--fg); border-color: #E9ECEF; }
+.tool-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.tool-btn.active:hover { background: #0B5ED7; }
+
+.tool-divider {
+  width: 1px; height: 20px; background: #E9ECEF; margin: 0 4px;
+}
+
+.doc-title { font-size: 0.82rem; font-weight: 500; color: var(--fg); max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.zoom-display { font-size: 0.72rem; color: var(--fg-secondary); min-width: 38px; text-align: center; user-select: none; }
+
+/* Scroll container - single page */
+.reader-scroll {
+  flex: 1; overflow-y: auto; background: #525659;
+  padding: 20px 0;
+}
+.reader-scroll canvas {
+  display: block; margin: 0 auto 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  background: #fff;
+}
+
+/* Double page spread */
+.reader-scroll.spread-mode {
+  padding: 20px 0;
+}
+.page-spread-row {
+  display: flex; justify-content: center; gap: 4px; margin-bottom: 12px;
+}
+.page-spread-row canvas {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  background: #fff;
+}
+
+/* Page overlay (bookmark/notes indicators) */
+.page-wrapper {
+  position: relative; display: inline-block;
+}
+.page-indicators {
+  position: absolute; top: 6px; right: 6px;
+  display: flex; gap: 4px; z-index: 5;
+}
+.page-indicator {
+  width: 22px; height: 22px; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.15s ease;
+  background: rgba(255,255,255,0.92); border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.page-indicator:hover { transform: scale(1.1); }
+.page-indicator.bookmarked { color: #F59F00; }
+.page-indicator.has-note { color: var(--accent); }
+.page-number-label {
+  position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
+  font-size: 0.65rem; color: #ADB5BD; background: rgba(255,255,255,0.9);
+  padding: 1px 6px; border-radius: 3px;
+}
+
+/* Note popup */
+.note-popup {
+  position: fixed; z-index: 200; width: 320px;
+  background: #fff; border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  border: 1px solid #E9ECEF; display: none;
+}
+.note-popup-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; border-bottom: 1px solid #F1F3F5;
+}
+.note-popup-title { font-size: 0.8rem; font-weight: 600; color: var(--fg); }
+.note-popup-close {
+  width: 22px; height: 22px; border: none; background: none;
+  cursor: pointer; color: var(--fg-secondary); display: flex;
+  align-items: center; justify-content: center; border-radius: 4px;
+}
+.note-popup-close:hover { background: #F1F3F5; color: var(--fg); }
+.note-popup-body { padding: 12px 14px; max-height: 300px; overflow-y: auto; }
+.note-popup-input-wrap {
+  padding: 10px 14px; border-top: 1px solid #F1F3F5;
+  display: flex; gap: 8px;
+}
+.note-popup-input {
+  flex: 1; height: 32px; border: 1px solid #DEE2E6; border-radius: 6px;
+  padding: 0 10px; font-size: 0.78rem; font-family: inherit; color: var(--fg);
+  outline: none;
+}
+.note-popup-input:focus { border-color: var(--accent); }
+.note-popup-send {
+  height: 32px; padding: 0 14px; border: none; border-radius: 6px;
+  background: var(--accent); color: #fff; font-size: 0.78rem; font-weight: 500;
+  cursor: pointer; font-family: inherit; transition: background 0.15s ease;
+}
+.note-popup-send:hover { background: #0B5ED7; }
+.note-popup-item {
+  padding: 8px 0; border-bottom: 1px solid #F8F9FA;
+}
+.note-popup-item:last-child { border-bottom: none; }
+.note-popup-item-text { font-size: 0.78rem; color: var(--fg); line-height: 1.5; word-break: break-word; }
+.note-popup-item-meta { font-size: 0.65rem; color: #ADB5BD; margin-top: 3px; }
+
+/* Drop zone */
+.drop-zone {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: var(--bg); z-index: 10;
+}
+.drop-zone-box {
+  border: 2px dashed #DEE2E6; border-radius: 12px;
+  padding: 60px 48px; text-align: center;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  cursor: pointer;
+}
+.drop-zone-box:hover, .drop-zone-box.dragover {
+  border-color: var(--accent); background: rgba(13,110,253,0.03);
+}
+.drop-zone-icon { margin-bottom: 14px; color: var(--fg-secondary); }
+.drop-zone-text { font-size: 0.9rem; color: var(--fg-secondary); margin-bottom: 6px; }
+.drop-zone-hint { font-size: 0.75rem; color: #ADB5BD; }
+.drop-zone input[type="file"] { display: none; }
+
+.loading-overlay {
+  position: absolute; inset: 0; display: flex;
+  align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.9); z-index: 20;
+  font-size: 0.88rem; color: var(--fg-secondary);
+}
+
+/* Text/DOCX document view */
+.doc-view {
+  flex: 1; overflow-y: auto; background: #F8F9FA;
+  padding: 20px 0;
+}
+.doc-view-inner {
+  max-width: 800px; margin: 0 auto; padding: 32px 40px;
+  background: #fff; min-height: 600px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  font-size: 0.92rem; line-height: 1.8; color: var(--fg);
+  word-wrap: break-word;
+}
+.doc-view-inner h1,.doc-view-inner h2,.doc-view-inner h3,
+.doc-view-inner h4,.doc-view-inner h5,.doc-view-inner h6 {
+  margin: 1.2em 0 0.6em; line-height: 1.4;
+}
+.doc-view-inner p { margin: 0.6em 0; }
+.doc-view-inner table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+.doc-view-inner td,.doc-view-inner th { border: 1px solid #DEE2E6; padding: 6px 10px; }
+.doc-view-inner img { max-width: 100%; height: auto; }
+.doc-view-inner pre { background: #F8F9FA; padding: 12px 16px; border-radius: 6px; overflow-x: auto; font-size: 0.85rem; }
+.doc-view-inner code { background: #F8F9FA; padding: 1px 4px; border-radius: 3px; font-size: 0.85em; }
+.doc-view-inner blockquote { border-left: 3px solid var(--accent); padding-left: 14px; color: var(--fg-secondary); margin: 1em 0; }
+
+/* Plain text view */
+.text-view {
+  white-space: pre-wrap; font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size: 0.85rem; line-height: 1.7; tab-size: 4;
+}
+
+/* View mode badge */
+.view-mode-badge {
+  font-size: 0.65rem; color: var(--fg-secondary); background: #F1F3F5;
+  padding: 2px 6px; border-radius: 3px; user-select: none;
+}
+
+@media (max-width: 900px) {
+  .reader-sidebar { position: fixed; z-index: 100; height: 100vh; box-shadow: 2px 0 8px rgba(0,0,0,0.1); }
+  .reader-sidebar.collapsed { margin-left: -240px; }
+  .toolbar-center { display: none; }
+  .page-spread-row { flex-direction: column; align-items: center; }
+}
+</style>
+</head>
+<body>
+<div class="reader-layout">
+  <!-- Sidebar -->
+  <div class="reader-sidebar collapsed" id="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-title">导航</span>
+      <button class="sidebar-close" onclick="toggleSidebar()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="sidebar-tabs">
+      <button class="sidebar-tab active" data-tab="outline" onclick="switchSidebarTab('outline')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-1px;margin-right:3px"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        目录
+      </button>
+      <button class="sidebar-tab" data-tab="bookmarks" onclick="switchSidebarTab('bookmarks')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:3px"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+        标记
+      </button>
+      <button class="sidebar-tab" data-tab="notes" onclick="switchSidebarTab('notes')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:3px"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        笔记
+      </button>
+    </div>
+
+    <!-- Outline panel -->
+    <div class="sidebar-panel active" id="panel-outline">
+      <div class="sidebar-outline" id="outline"></div>
+    </div>
+
+    <!-- Bookmarks panel -->
+    <div class="sidebar-panel" id="panel-bookmarks">
+      <div class="bookmark-list" id="bookmark-list">
+        <div class="bookmarks-empty">暂无页面标记</div>
+      </div>
+    </div>
+
+    <!-- Notes panel -->
+    <div class="sidebar-panel" id="panel-notes">
+      <div class="note-list" id="note-list">
+        <div class="notes-empty">暂无页面笔记</div>
+      </div>
+    </div>
+
+    <div class="sidebar-pages">
+      <div class="page-jump">
+        <span>跳转到</span>
+        <input type="number" id="page-input" min="1" value="1" onkeydown="if(event.key==='Enter')jumpToPage()">
+        <span>/ <span id="total-pages">0</span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="reader-main">
+    <div class="reader-toolbar" id="toolbar" style="display:none">
+      <div class="toolbar-left">
+        <button class="tool-btn" onclick="toggleSidebar()" title="侧边栏">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <span class="doc-title" id="doc-title"></span>
+      </div>
+      <div class="toolbar-center">
+        <button class="tool-btn" onclick="goPrevPage()" title="上一页">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <span class="zoom-display" id="page-display">1 / 1</span>
+        <button class="tool-btn" onclick="goNextPage()" title="下一页">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="tool-divider"></div>
+        <button class="tool-btn" id="btn-single" onclick="setViewMode('single')" title="单页视图">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="1"/></svg>
+        </button>
+        <button class="tool-btn" id="btn-spread" onclick="setViewMode('spread')" title="双页视图">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="8" height="18" rx="1"/><rect x="14" y="3" width="8" height="18" rx="1"/></svg>
+        </button>
+        <div class="tool-divider"></div>
+        <button class="tool-btn" onclick="zoomOut()" title="缩小">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        </button>
+        <span class="zoom-display" id="zoom-level">100%</span>
+        <button class="tool-btn" onclick="zoomIn()" title="放大">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        </button>
+      </div>
+      <div class="toolbar-right">
+        <button class="tool-btn" id="btn-bookmark" onclick="toggleBookmarkCurrentPage()" title="标记当前页">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+        </button>
+        <button class="tool-btn" id="btn-note" onclick="openNotePopup()" title="添加笔记">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </button>
+        <div class="tool-divider"></div>
+        <button class="tool-btn" onclick="location.href='../'" title="返回书架">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Drop zone -->
+    <div class="drop-zone" id="drop-zone">
+      <div class="drop-zone-box" id="drop-box">
+        <div class="drop-zone-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+        </div>
+        <div class="drop-zone-text">拖拽文档文件到此处，或点击选择文件</div>
+        <div class="drop-zone-hint">支持 PDF、DOCX、TXT、Markdown 等格式，本地渲染不上传</div>
+        <input type="file" id="file-input" accept=".pdf,.docx,.txt,.md,.markdown,.html,.htm,.epub">
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-overlay" id="loading" style="display:none">正在加载文档...</div>
+
+    <!-- Scroll container (PDF) -->
+    <div class="reader-scroll" id="scroll-container"></div>
+
+    <!-- Document view (DOCX/TXT/MD/HTML) -->
+    <div class="doc-view" id="doc-view" style="display:none">
+      <div class="doc-view-inner" id="doc-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Note popup -->
+<div class="note-popup" id="note-popup">
+  <div class="note-popup-header">
+    <span class="note-popup-title" id="note-popup-title">第 1 页笔记</span>
+    <button class="note-popup-close" onclick="closeNotePopup()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="note-popup-body" id="note-popup-body"></div>
+  <div class="note-popup-input-wrap">
+    <input class="note-popup-input" id="note-popup-input" placeholder="输入笔记内容..." onkeydown="if(event.key==='Enter')submitPageNote()">
+    <button class="note-popup-send" onclick="submitPageNote()">添加</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://unpkg.com/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx-preview@0.3.7/dist/docx-preview.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+let pdfDoc = null;
+let totalPages = 0;
+let currentScale = 1.2;
+let pageCanvases = [];
+let outlineItems = [];
+let currentFileType = null;
+let viewMode = 'single'; // 'single' | 'spread'
+let currentPage = 1;
+let notePopupPage = null;
+
+// --- Storage keys ---
+function getDocKey() {
+  const title = document.getElementById('doc-title').textContent || 'unknown';
+  return 'reader_' + title.replace(/[^a-zA-Z0-9\u4e00-\u9fff]/g, '_');
+}
+function getBookmarks() {
+  try { return JSON.parse(localStorage.getItem(getDocKey() + '_bm') || '[]'); } catch { return []; }
+}
+function saveBookmarks(bm) {
+  localStorage.setItem(getDocKey() + '_bm', JSON.stringify(bm));
+}
+function getPageNotes() {
+  try { return JSON.parse(localStorage.getItem(getDocKey() + '_notes') || '{}'); } catch { return {}; }
+}
+function savePageNotes(notes) {
+  localStorage.setItem(getDocKey() + '_notes', JSON.stringify(notes));
+}
+
+// --- File type detection ---
+function getFileType(file) {
+  const name = file.name.toLowerCase();
+  const ext = name.split('.').pop();
+  const typeMap = {
+    'pdf': 'pdf', 'docx': 'docx', 'doc': 'docx',
+    'txt': 'txt', 'md': 'md', 'markdown': 'md',
+    'html': 'html', 'htm': 'html', 'epub': 'epub',
+    'csv': 'txt', 'log': 'txt', 'json': 'txt', 'xml': 'txt',
+    'yaml': 'txt', 'yml': 'txt', 'ini': 'txt', 'conf': 'txt', 'cfg': 'txt',
+    'py': 'txt', 'js': 'txt', 'ts': 'txt', 'css': 'txt',
+    'java': 'txt', 'c': 'txt', 'cpp': 'txt', 'h': 'txt',
+    'sh': 'txt', 'bat': 'txt', 'ps1': 'txt', 'sql': 'txt',
+    'rb': 'txt', 'go': 'txt', 'rs': 'txt', 'swift': 'txt', 'kt': 'txt',
+  };
+  return typeMap[ext] || null;
+}
+
+function getSupportedExts() {
+  return '.pdf,.docx,.txt,.md,.markdown,.html,.htm,.epub,.csv,.log,.json,.xml,.yaml,.yml,.py,.js,.ts,.css,.java,.c,.cpp,.h,.sh,.bat,.sql,.rb,.go,.rs,.swift,.kt';
+}
+
+// --- Drop zone ---
+const dropZone = document.getElementById('drop-zone');
+const dropBox = document.getElementById('drop-box');
+const fileInput = document.getElementById('file-input');
+
+dropBox.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+dropBox.addEventListener('dragover', e => { e.preventDefault(); dropBox.classList.add('dragover'); });
+dropBox.addEventListener('dragleave', () => dropBox.classList.remove('dragover'));
+dropBox.addEventListener('drop', e => {
+  e.preventDefault(); dropBox.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) handleFile(file);
+});
+
+document.addEventListener('dragover', e => e.preventDefault());
+document.addEventListener('drop', e => {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if (file) handleFile(file);
+});
+
+function handleFile(file) {
+  const fileType = getFileType(file);
+  if (!fileType) { showError('不支持的文件格式'); return; }
+  currentFileType = fileType;
+  const baseName = file.name.replace(/\.[^.]+$/, '');
+  document.getElementById('doc-title').textContent = baseName;
+  document.title = baseName + ' · TF120';
+
+  switch (fileType) {
+    case 'pdf': loadLocalPDF(file); break;
+    case 'docx': loadLocalDOCX(file); break;
+    case 'txt': loadLocalText(file); break;
+    case 'md': loadLocalMarkdown(file); break;
+    case 'html': loadLocalHTML(file); break;
+    case 'epub': showError('EPUB 格式暂不支持，请转换为 PDF 后打开'); break;
+    default: showError('不支持的文件格式');
+  }
+}
+
+function showError(msg) {
+  dropBox.innerHTML = `<div style="color:#DC3545;font-size:0.88rem;">${msg}</div>
+    <div style="margin-top:8px;font-size:0.75rem;color:#ADB5BD;">点击重新选择文件</div>
+    <input type="file" id="file-input" accept="${getSupportedExts()}">`;
+  const newInput = dropBox.querySelector('input');
+  newInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+}
+
+// --- PDF ---
+function loadLocalPDF(file) {
+  const reader = new FileReader();
+  reader.onload = function() { openPDF(new Uint8Array(this.result)); };
+  reader.readAsArrayBuffer(file);
+}
+
+const params = new URLSearchParams(location.search);
+const bookId = params.get('book');
+
+async function openPDF(source) {
+  document.getElementById('loading').style.display = '';
+  dropZone.style.display = 'none';
+  document.getElementById('scroll-container').style.display = '';
+  document.getElementById('doc-view').style.display = 'none';
+
+  try {
+    pdfDoc = await pdfjsLib.getDocument(source).promise;
+    totalPages = pdfDoc.numPages;
+    document.getElementById('total-pages').textContent = totalPages;
+    document.getElementById('page-input').max = totalPages;
+    document.getElementById('toolbar').style.display = '';
+    document.getElementById('loading').style.display = 'none';
+
+    await loadOutline();
+    await renderAllPages();
+    updateViewModeButtons();
+    refreshBookmarkButton();
+    refreshSidebarBookmarks();
+    refreshSidebarNotes();
+  } catch (err) {
+    document.getElementById('loading').style.display = 'none';
+    dropZone.style.display = '';
+    showError('文档加载失败');
+    console.error(err);
+  }
+}
+
+async function loadOutline() {
+  const outline = document.getElementById('outline');
+  outline.innerHTML = '';
+  try {
+    const pdfOutline = await pdfDoc.getOutline();
+    if (!pdfOutline || !pdfOutline.length) {
+      outline.innerHTML = '<div style="padding:12px 16px;font-size:0.75rem;color:#ADB5BD;">此PDF没有目录信息</div>';
+      return;
+    }
+    function renderItems(items, level) {
+      items.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'outline-item';
+        btn.setAttribute('data-level', level);
+        btn.textContent = item.title;
+        btn.onclick = () => goToOutlineItem(item);
+        outline.appendChild(btn);
+        if (item.items && item.items.length) renderItems(item.items, level + 1);
+      });
+    }
+    renderItems(pdfOutline, 1);
+    outlineItems = pdfOutline;
+  } catch (e) {
+    outline.innerHTML = '<div style="padding:12px 16px;font-size:0.75rem;color:#ADB5BD;">无法读取目录</div>';
+  }
+}
+
+async function goToOutlineItem(item) {
+  if (!item.dest) return;
+  try {
+    let dest = item.dest;
+    if (typeof dest === 'string') dest = await pdfDoc.getDestination(dest);
+    const ref = dest[0];
+    const pageIndex = await pdfDoc.getPageIndex(ref);
+    scrollToPage(pageIndex + 1);
+  } catch (e) { console.error(e); }
+}
+
+// --- Render pages ---
+let lastDevicePixelRatio = window.devicePixelRatio;
+
+async function renderAllPages() {
+  const container = document.getElementById('scroll-container');
+  container.innerHTML = '';
+  pageCanvases = [];
+  lastDevicePixelRatio = window.devicePixelRatio;
+
+  if (viewMode === 'spread') {
+    await renderSpreadPages(container);
+  } else {
+    await renderSinglePages(container);
+  }
+
+  container.removeEventListener('scroll', updateCurrentPage);
+  container.addEventListener('scroll', updateCurrentPage);
+  updateCurrentPage();
+}
+
+function getRenderScale() {
+  return currentScale * window.devicePixelRatio;
+}
+
+function setupHiDPICanvas(canvas, viewport) {
+  const dpr = window.devicePixelRatio;
+  canvas.width = Math.floor(viewport.width * dpr);
+  canvas.height = Math.floor(viewport.height * dpr);
+  canvas.style.width = Math.floor(viewport.width) + 'px';
+  canvas.style.height = Math.floor(viewport.height) + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
+async function renderSinglePages(container) {
+  container.classList.remove('spread-mode');
+  for (let i = 1; i <= totalPages; i++) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'page-wrapper';
+    wrapper.style.cssText = 'display:flex;justify-content:center;position:relative;';
+
+    const page = await pdfDoc.getPage(i);
+    const viewport = page.getViewport({ scale: currentScale });
+    const canvas = document.createElement('canvas');
+    canvas.dataset.page = i;
+    canvas.style.display = 'block';
+    canvas.style.margin = '0 auto 12px';
+    canvas.style.boxShadow = '0 2px 8px rgba(0,0,0,0.18)';
+    canvas.style.background = '#fff';
+
+    const ctx = setupHiDPICanvas(canvas, viewport);
+    wrapper.appendChild(canvas);
+    wrapper.appendChild(createPageIndicators(i));
+    container.appendChild(wrapper);
+    pageCanvases.push(canvas);
+    page.render({ canvasContext: ctx, viewport });
+  }
+}
+
+async function renderSpreadPages(container) {
+  container.classList.add('spread-mode');
+  for (let i = 1; i <= totalPages; i += 2) {
+    const row = document.createElement('div');
+    row.className = 'page-spread-row';
+
+    // Left page (odd)
+    const leftWrapper = document.createElement('div');
+    leftWrapper.className = 'page-wrapper';
+    leftWrapper.style.position = 'relative';
+    const leftPage = await pdfDoc.getPage(i);
+    const leftVP = leftPage.getViewport({ scale: currentScale });
+    const leftCanvas = document.createElement('canvas');
+    leftCanvas.dataset.page = i;
+    const leftCtx = setupHiDPICanvas(leftCanvas, leftVP);
+    leftWrapper.appendChild(leftCanvas);
+    leftWrapper.appendChild(createPageIndicators(i));
+    row.appendChild(leftWrapper);
+    pageCanvases.push(leftCanvas);
+    leftPage.render({ canvasContext: leftCtx, viewport: leftVP });
+
+    // Right page (even) if exists
+    if (i + 1 <= totalPages) {
+      const rightWrapper = document.createElement('div');
+      rightWrapper.className = 'page-wrapper';
+      rightWrapper.style.position = 'relative';
+      const rightPage = await pdfDoc.getPage(i + 1);
+      const rightVP = rightPage.getViewport({ scale: currentScale });
+      const rightCanvas = document.createElement('canvas');
+      rightCanvas.dataset.page = i + 1;
+      const rightCtx = setupHiDPICanvas(rightCanvas, rightVP);
+      rightWrapper.appendChild(rightCanvas);
+      rightWrapper.appendChild(createPageIndicators(i + 1));
+      row.appendChild(rightWrapper);
+      pageCanvases.push(rightCanvas);
+      rightPage.render({ canvasContext: rightCtx, viewport: rightVP });
+    }
+
+    container.appendChild(row);
+  }
+}
+
+// Re-render when browser zoom changes
+let zoomRerenderTimer = null;
+window.addEventListener('resize', function() {
+  if (!pdfDoc) return;
+  const newRatio = window.devicePixelRatio;
+  if (newRatio !== lastDevicePixelRatio) {
+    lastDevicePixelRatio = newRatio;
+    clearTimeout(zoomRerenderTimer);
+    zoomRerenderTimer = setTimeout(function() { renderAllPages(); }, 200);
+  }
+});
+
+function createPageIndicators(pageNum) {
+  const indicators = document.createElement('div');
+  indicators.className = 'page-indicators';
+
+  const bm = getBookmarks();
+  const notes = getPageNotes();
+  const isBookmarked = bm.includes(pageNum);
+  const hasNote = notes[String(pageNum)] && notes[String(pageNum)].length > 0;
+
+  // Bookmark indicator
+  const bmBtn = document.createElement('div');
+  bmBtn.className = 'page-indicator' + (isBookmarked ? ' bookmarked' : '');
+  bmBtn.title = isBookmarked ? '取消标记' : '标记此页';
+  bmBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="' + (isBookmarked ? '#F59F00' : 'none') + '" stroke="' + (isBookmarked ? '#F59F00' : 'currentColor') + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>';
+  bmBtn.onclick = function(e) { e.stopPropagation(); toggleBookmark(pageNum); };
+
+  // Note indicator
+  const noteBtn = document.createElement('div');
+  noteBtn.className = 'page-indicator' + (hasNote ? ' has-note' : '');
+  noteBtn.title = hasNote ? '查看笔记' : '添加笔记';
+  noteBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';
+  noteBtn.onclick = function(e) { e.stopPropagation(); openNotePopupForPage(pageNum); };
+
+  indicators.appendChild(bmBtn);
+  indicators.appendChild(noteBtn);
+
+  // Page number label
+  const label = document.createElement('div');
+  label.className = 'page-number-label';
+  label.textContent = pageNum;
+
+  const frag = document.createDocumentFragment();
+  frag.appendChild(indicators);
+  frag.appendChild(label);
+  return frag;
+}
+
+function updateCurrentPage() {
+  const container = document.getElementById('scroll-container');
+  const scrollTop = container.scrollTop;
+  let current = 1;
+  for (let i = 0; i < pageCanvases.length; i++) {
+    if (pageCanvases[i].offsetTop - 60 > scrollTop) break;
+    current = parseInt(pageCanvases[i].dataset.page);
+  }
+  currentPage = current;
+  document.getElementById('page-input').value = current;
+  document.getElementById('page-display').textContent = current + ' / ' + totalPages;
+  refreshBookmarkButton();
+  document.querySelectorAll('.outline-item').forEach(el => el.classList.remove('active'));
+}
+
+function scrollToPage(num) {
+  if (num < 1 || num > totalPages) return;
+  const canvas = pageCanvases.find(c => parseInt(c.dataset.page) === num);
+  if (canvas) {
+    const container = document.getElementById('scroll-container');
+    const wrapper = canvas.closest('.page-wrapper') || canvas;
+    container.scrollTo({ top: wrapper.offsetTop - 10, behavior: 'smooth' });
+  }
+}
+
+function jumpToPage() {
+  const num = parseInt(document.getElementById('page-input').value);
+  if (num >= 1 && num <= totalPages) scrollToPage(num);
+}
+
+function goPrevPage() {
+  if (currentPage > 1) scrollToPage(currentPage - 1);
+}
+function goNextPage() {
+  if (currentPage < totalPages) scrollToPage(currentPage + 1);
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('collapsed');
+}
+
+function switchSidebarTab(tab) {
+  document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.querySelectorAll('.sidebar-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + tab));
+}
+
+// --- View mode ---
+function setViewMode(mode) {
+  viewMode = mode;
+  updateViewModeButtons();
+  if (pdfDoc) renderAllPages();
+}
+
+function updateViewModeButtons() {
+  document.getElementById('btn-single').classList.toggle('active', viewMode === 'single');
+  document.getElementById('btn-spread').classList.toggle('active', viewMode === 'spread');
+}
+
+// --- Zoom ---
+function zoomIn() {
+  currentScale = Math.min(currentScale + 0.2, 3.0);
+  applyZoom();
+}
+function zoomOut() {
+  currentScale = Math.max(currentScale - 0.2, 0.4);
+  applyZoom();
+}
+async function applyZoom() {
+  document.getElementById('zoom-level').textContent = Math.round(currentScale / 1.2 * 100) + '%';
+  if (pdfDoc) await renderAllPages();
+}
+
+// --- Bookmarks ---
+function toggleBookmark(pageNum) {
+  let bm = getBookmarks();
+  const idx = bm.indexOf(pageNum);
+  if (idx === -1) bm.push(pageNum); else bm.splice(idx, 1);
+  bm.sort((a, b) => a - b);
+  saveBookmarks(bm);
+  refreshBookmarkButton();
+  refreshPageIndicators();
+  refreshSidebarBookmarks();
+}
+
+function toggleBookmarkCurrentPage() {
+  toggleBookmark(currentPage);
+}
+
+function isPageBookmarked(pageNum) {
+  return getBookmarks().includes(pageNum);
+}
+
+function refreshBookmarkButton() {
+  const btn = document.getElementById('btn-bookmark');
+  const bm = isPageBookmarked(currentPage);
+  btn.classList.toggle('active', bm);
+  btn.innerHTML = bm
+    ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="#F59F00" stroke="#F59F00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>'
+    : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>';
+}
+
+function refreshPageIndicators() {
+  if (!pdfDoc) return;
+  // Re-render to update indicators
+  renderAllPages();
+}
+
+function refreshSidebarBookmarks() {
+  const list = document.getElementById('bookmark-list');
+  const bm = getBookmarks();
+  if (!bm.length) {
+    list.innerHTML = '<div class="bookmarks-empty">暂无页面标记</div>';
+    return;
+  }
+  const notes = getPageNotes();
+  list.innerHTML = bm.map(p => {
+    const pageNotes = notes[String(p)] || [];
+    const notePreview = pageNotes.length > 0 ? pageNotes[pageNotes.length - 1].text.substring(0, 30) : '';
+    return `<div class="bookmark-item" onclick="scrollToPage(${p})">
+      <div class="bookmark-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#F59F00" stroke="#F59F00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+      </div>
+      <div class="bookmark-info">
+        <div class="bookmark-page">第 ${p} 页</div>
+        ${notePreview ? `<div class="bookmark-note">${escapeHtml(notePreview)}</div>` : ''}
+      </div>
+      <button class="bookmark-delete" onclick="event.stopPropagation();toggleBookmark(${p})" title="删除标记">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>`;
+  }).join('');
+}
+
+// --- Notes ---
+function openNotePopup() {
+  openNotePopupForPage(currentPage);
+}
+
+function openNotePopupForPage(pageNum) {
+  notePopupPage = pageNum;
+  const popup = document.getElementById('note-popup');
+  document.getElementById('note-popup-title').textContent = '第 ' + pageNum + ' 页笔记';
+  renderNotePopupBody(pageNum);
+  popup.style.display = '';
+
+  // Position near the page
+  const canvas = pageCanvases.find(c => parseInt(c.dataset.page) === pageNum);
+  if (canvas) {
+    const rect = canvas.getBoundingClientRect();
+    let left = rect.right + 10;
+    let top = rect.top;
+    if (left + 330 > window.innerWidth) left = rect.left - 330;
+    if (left < 10) left = 10;
+    if (top + 350 > window.innerHeight) top = window.innerHeight - 360;
+    if (top < 10) top = 10;
+    popup.style.left = left + 'px';
+    popup.style.top = top + 'px';
+  } else {
+    popup.style.left = '50%';
+    popup.style.top = '50%';
+    popup.style.transform = 'translate(-50%,-50%)';
+  }
+
+  document.getElementById('note-popup-input').focus();
+}
+
+function closeNotePopup() {
+  document.getElementById('note-popup').style.display = 'none';
+  notePopupPage = null;
+}
+
+function renderNotePopupBody(pageNum) {
+  const notes = getPageNotes();
+  const pageNotes = notes[String(pageNum)] || [];
+  const body = document.getElementById('note-popup-body');
+
+  if (!pageNotes.length) {
+    body.innerHTML = '<div style="padding:8px 0;font-size:0.75rem;color:#ADB5BD;text-align:center">暂无笔记</div>';
+    return;
+  }
+
+  body.innerHTML = pageNotes.map((n, i) => `
+    <div class="note-popup-item">
+      <div style="display:flex;justify-content:space-between;align-items:start">
+        <div class="note-popup-item-text">${escapeHtml(n.text)}</div>
+        <button style="width:18px;height:18px;border:none;background:none;cursor:pointer;color:#ADB5BD;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:3px" onclick="deletePageNote(${pageNum},${i})" title="删除">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="note-popup-item-meta">${formatTime(n.time)}</div>
+    </div>
+  `).join('');
+}
+
+function submitPageNote() {
+  if (notePopupPage === null) return;
+  const input = document.getElementById('note-popup-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const notes = getPageNotes();
+  const key = String(notePopupPage);
+  if (!notes[key]) notes[key] = [];
+  notes[key].push({ text: text, time: Date.now() });
+  savePageNotes(notes);
+  input.value = '';
+
+  renderNotePopupBody(notePopupPage);
+  refreshSidebarNotes();
+  refreshPageIndicators();
+}
+
+function deletePageNote(pageNum, index) {
+  const notes = getPageNotes();
+  const key = String(pageNum);
+  if (notes[key]) {
+    notes[key].splice(index, 1);
+    if (notes[key].length === 0) delete notes[key];
+    savePageNotes(notes);
+  }
+  renderNotePopupBody(pageNum);
+  refreshSidebarNotes();
+  refreshPageIndicators();
+}
+
+function refreshSidebarNotes() {
+  const list = document.getElementById('note-list');
+  const notes = getPageNotes();
+  const entries = [];
+  for (const [page, items] of Object.entries(notes)) {
+    items.forEach((item, idx) => entries.push({ page: parseInt(page), ...item, idx }));
+  }
+
+  if (!entries.length) {
+    list.innerHTML = '<div class="notes-empty">暂无页面笔记</div>';
+    return;
+  }
+
+  entries.sort((a, b) => b.time - a.time);
+  list.innerHTML = entries.map(n => `
+    <div class="note-item" onclick="scrollToPage(${n.page});openNotePopupForPage(${n.page})">
+      <div style="display:flex;justify-content:space-between;align-items:start">
+        <div class="note-page-badge">第 ${n.page} 页</div>
+        <button class="note-delete" onclick="event.stopPropagation();deletePageNote(${n.page},${n.idx})" title="删除">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="note-text">${escapeHtml(n.text)}</div>
+      <div style="font-size:0.65rem;color:#ADB5BD;margin-top:3px">${formatTime(n.time)}</div>
+    </div>
+  `).join('');
+}
+
+// --- Keyboard shortcuts ---
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goPrevPage(); }
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); goNextPage(); }
+  if (e.key === 'b' || e.key === 'B') toggleBookmarkCurrentPage();
+  if (e.key === 'n' || e.key === 'N') openNotePopup();
+  if (e.key === 'Escape') closeNotePopup();
+});
+
+// Close note popup on outside click
+document.addEventListener('click', function(e) {
+  const popup = document.getElementById('note-popup');
+  if (popup.style.display !== 'none' && !popup.contains(e.target)) {
+    const noteBtn = document.getElementById('btn-note');
+    if (!noteBtn.contains(e.target)) closeNotePopup();
+  }
+});
+
+// --- DOCX ---
+async function loadLocalDOCX(file) {
+  document.getElementById('loading').style.display = '';
+  dropZone.style.display = 'none';
+  document.getElementById('scroll-container').style.display = 'none';
+  document.getElementById('doc-view').style.display = '';
+  document.getElementById('toolbar').style.display = '';
+  document.getElementById('total-pages').textContent = '-';
+  document.getElementById('page-input').disabled = true;
+  document.getElementById('page-display').textContent = '-';
+  document.getElementById('btn-spread').style.display = 'none';
+
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const container = document.getElementById('doc-content');
+    container.innerHTML = '';
+
+    if (typeof docx !== 'undefined' && docx.renderAsync) {
+      await docx.renderAsync(arrayBuffer, container, null, {
+        className: 'docx-view', inWrapper: true,
+        ignoreWidth: false, ignoreHeight: false,
+        ignoreFonts: false, breakPages: true,
+      });
+    } else {
+      throw new Error('docx-preview library not loaded');
+    }
+    document.getElementById('loading').style.display = 'none';
+  } catch (err) {
+    document.getElementById('loading').style.display = 'none';
+    dropZone.style.display = '';
+    document.getElementById('doc-view').style.display = 'none';
+    document.getElementById('page-input').disabled = false;
+    showError('DOCX 加载失败：' + (err.message || '未知错误'));
+    console.error(err);
+  }
+}
+
+// --- Plain Text ---
+function loadLocalText(file) {
+  document.getElementById('loading').style.display = '';
+  dropZone.style.display = 'none';
+  document.getElementById('scroll-container').style.display = 'none';
+  document.getElementById('doc-view').style.display = '';
+  document.getElementById('toolbar').style.display = '';
+  document.getElementById('total-pages').textContent = '-';
+  document.getElementById('page-input').disabled = true;
+  document.getElementById('page-display').textContent = '-';
+  document.getElementById('btn-spread').style.display = 'none';
+
+  const reader = new FileReader();
+  reader.onload = function() {
+    const container = document.getElementById('doc-content');
+    container.innerHTML = '';
+    const pre = document.createElement('pre');
+    pre.className = 'text-view';
+    pre.textContent = this.result;
+    container.appendChild(pre);
+    document.getElementById('loading').style.display = 'none';
+  };
+  reader.onerror = function() {
+    document.getElementById('loading').style.display = 'none';
+    dropZone.style.display = '';
+    document.getElementById('doc-view').style.display = 'none';
+    document.getElementById('page-input').disabled = false;
+    showError('文件读取失败');
+  };
+  reader.readAsText(file);
+}
+
+// --- Markdown ---
+function loadLocalMarkdown(file) {
+  document.getElementById('loading').style.display = '';
+  dropZone.style.display = 'none';
+  document.getElementById('scroll-container').style.display = 'none';
+  document.getElementById('doc-view').style.display = '';
+  document.getElementById('toolbar').style.display = '';
+  document.getElementById('total-pages').textContent = '-';
+  document.getElementById('page-input').disabled = true;
+  document.getElementById('page-display').textContent = '-';
+  document.getElementById('btn-spread').style.display = 'none';
+
+  const reader = new FileReader();
+  reader.onload = function() {
+    const container = document.getElementById('doc-content');
+    container.innerHTML = '';
+    try {
+      if (typeof marked !== 'undefined') {
+        container.innerHTML = marked.parse(this.result);
+      } else {
+        const pre = document.createElement('pre');
+        pre.className = 'text-view';
+        pre.textContent = this.result;
+        container.appendChild(pre);
+      }
+    } catch (e) {
+      const pre = document.createElement('pre');
+      pre.className = 'text-view';
+      pre.textContent = this.result;
+      container.appendChild(pre);
+    }
+    document.getElementById('loading').style.display = 'none';
+  };
+  reader.onerror = function() {
+    document.getElementById('loading').style.display = 'none';
+    dropZone.style.display = '';
+    document.getElementById('doc-view').style.display = 'none';
+    document.getElementById('page-input').disabled = false;
+    showError('文件读取失败');
+  };
+  reader.readAsText(file);
+}
+
+// --- HTML ---
+function loadLocalHTML(file) {
+  document.getElementById('loading').style.display = '';
+  dropZone.style.display = 'none';
+  document.getElementById('scroll-container').style.display = 'none';
+  document.getElementById('doc-view').style.display = '';
+  document.getElementById('toolbar').style.display = '';
+  document.getElementById('total-pages').textContent = '-';
+  document.getElementById('page-input').disabled = true;
+  document.getElementById('page-display').textContent = '-';
+  document.getElementById('btn-spread').style.display = 'none';
+
+  const reader = new FileReader();
+  reader.onload = function() {
+    const container = document.getElementById('doc-content');
+    container.innerHTML = '';
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'width:100%;border:none;min-height:600px;';
+    iframe.srcdoc = this.result;
+    iframe.onload = function() {
+      try {
+        const h = iframe.contentDocument.documentElement.scrollHeight;
+        iframe.style.height = Math.max(h, 600) + 'px';
+      } catch(e) {}
+    };
+    container.appendChild(iframe);
+    document.getElementById('loading').style.display = 'none';
+  };
+  reader.onerror = function() {
+    document.getElementById('loading').style.display = 'none';
+    dropZone.style.display = '';
+    document.getElementById('doc-view').style.display = 'none';
+    document.getElementById('page-input').disabled = false;
+    showError('文件读取失败');
+  };
+  reader.readAsText(file);
+}
+
+// --- Utils ---
+function formatTime(ts) {
+  const diff = Date.now() - ts;
+  if (diff < 60000) return '刚刚';
+  if (diff < 3600000) return Math.floor(diff / 60000) + '分钟前';
+  if (diff < 86400000) return Math.floor(diff / 3600000) + '小时前';
+  return Math.floor(diff / 86400000) + '天前';
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+</script>
+</body>
+</html>

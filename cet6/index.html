@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CET6 选词填空 · 核心词汇</title>
+<meta name="description" content="CET6六级选词填空14-25年核心词汇总结，830+高频词汇及释义，助你攻克六级选词填空。">
+<meta name="keywords" content="CET6,六级,选词填空,六级词汇,英语六级,六级备考,六级单词">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<style>
+/* Mode toggle */
+.mode-toggle { display: inline-flex; gap: 0; margin-bottom: 24px; border: 1px solid #DEE2E6; border-radius: 6px; overflow: hidden; }
+.mode-btn { padding: 6px 16px; font-size: 0.82rem; font-family: inherit; border: none; background: var(--bg); color: var(--fg-secondary); cursor: pointer; transition: all 0.15s ease; }
+.mode-btn:hover { background: var(--bg-secondary); }
+.mode-btn.active { background: var(--accent); color: #fff; }
+
+/* Study sub-modes */
+.study-modes { display: flex; gap: 8px; margin-bottom: 24px; }
+.study-mode-btn { padding: 6px 14px; font-size: 0.8rem; font-family: inherit; border: 1px solid #DEE2E6; border-radius: 6px; background: var(--bg); color: var(--fg-secondary); cursor: pointer; transition: all 0.15s ease; }
+.study-mode-btn:hover { border-color: var(--accent); color: var(--accent); }
+.study-mode-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* Search */
+.search-box { padding: 8px 16px; }
+.search-input { width: 100%; padding: 6px 10px; border: 1px solid #DEE2E6; border-radius: 6px; font-size: 0.82rem; font-family: inherit; color: var(--fg); outline: none; background: var(--bg); }
+.search-input:focus { border-color: var(--accent); }
+.search-result-count { font-size: 0.72rem; color: var(--fg-secondary); padding: 2px 16px 6px; }
+
+/* Dictation mode */
+.dictation-card { max-width: 500px; margin: 0 auto; text-align: center; padding: 40px 20px; }
+.dictation-word { font-size: 2.5rem; font-weight: 600; color: var(--fg); margin-bottom: 32px; }
+.dictation-input { width: 100%; max-width: 360px; padding: 10px 14px; border: 2px solid #DEE2E6; border-radius: 8px; font-size: 1rem; font-family: inherit; color: var(--fg); outline: none; text-align: center; margin-bottom: 16px; }
+.dictation-input:focus { border-color: var(--accent); }
+.dictation-input.correct { border-color: #37B24D; background: rgba(55,178,77,0.05); }
+.dictation-input.wrong { border-color: #F03E3E; background: rgba(240,62,62,0.05); }
+.dictation-feedback { font-size: 0.92rem; margin-bottom: 16px; min-height: 1.5em; }
+.dictation-feedback.correct { color: #37B24D; }
+.dictation-feedback.wrong { color: #F03E3E; }
+.dictation-answer { font-size: 0.92rem; color: var(--fg-secondary); margin-bottom: 16px; }
+.dictation-progress { font-size: 0.78rem; color: var(--fg-secondary); margin-bottom: 24px; }
+
+/* Choice mode */
+.choice-card { max-width: 500px; margin: 0 auto; padding: 40px 20px; }
+.choice-question { font-size: 1.8rem; font-weight: 600; color: var(--fg); margin-bottom: 32px; text-align: center; }
+.choice-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+.choice-option { padding: 12px 16px; border: 2px solid #DEE2E6; border-radius: 8px; font-size: 0.95rem; cursor: pointer; transition: all 0.15s ease; text-align: left; font-family: inherit; background: var(--bg); color: var(--fg); }
+.choice-option:hover { border-color: var(--accent); }
+.choice-option.correct { border-color: #37B24D; background: rgba(55,178,77,0.08); color: #37B24D; }
+.choice-option.wrong { border-color: #F03E3E; background: rgba(240,62,62,0.08); color: #F03E3E; }
+.choice-option.disabled { pointer-events: none; opacity: 0.7; }
+.choice-progress { font-size: 0.78rem; color: var(--fg-secondary); text-align: center; margin-bottom: 16px; }
+
+/* Word mastery indicators */
+.word-mastery { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+.word-mastery.mastered { background: #37B24D; }
+.word-mastery.learning { background: #F59F00; }
+.word-mastery.difficult { background: #F03E3E; }
+.word-mastery.new { background: #DEE2E6; }
+
+/* Larger word display */
+.word-item-word { font-size: 1.05rem !important; }
+.word-title { font-size: 2.5rem !important; }
+
+/* Etymology in word detail */
+.word-etymology { margin-bottom: 36px; }
+.word-etymology-label { font-size: 0.78rem; font-weight: 600; color: var(--fg-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+.word-etymology-text { font-size: 0.95rem; line-height: 1.9; color: var(--fg-secondary); }
+
+/* Study stats bar */
+.study-stats { display: flex; gap: 16px; margin-bottom: 24px; padding: 12px 16px; background: var(--bg-secondary); border-radius: 8px; }
+.study-stat { text-align: center; flex: 1; }
+.study-stat-num { font-size: 1.2rem; font-weight: 600; color: var(--fg); }
+.study-stat-label { font-size: 0.7rem; color: var(--fg-secondary); }
+
+/* Submit/Next buttons */
+.action-btn { padding: 8px 24px; border: none; border-radius: 6px; font-size: 0.88rem; font-family: inherit; cursor: pointer; transition: opacity 0.15s ease; }
+.action-btn:hover { opacity: 0.85; }
+.action-btn-primary { background: var(--accent); color: #fff; }
+.action-btn-secondary { background: var(--bg-secondary); color: var(--fg-secondary); }
+
+/* Search highlight */
+.search-highlight { background: rgba(13,110,253,0.15); color: var(--accent); border-radius: 2px; padding: 0 1px; }
+
+/* Study mode word-item meaning hidden */
+.word-item-meaning-hidden { color: #CED4DA; letter-spacing: 2px; }
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar" id="sidebar">
+<nav class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title" onclick="toggleNavSection(this)">
+<span>导航</span>
+<span class="nav-arrow">▾</span>
+</div>
+<div class="nav-section-items">
+<div class="nav-item active" onclick="showHome()">CET6选词填空</div>
+</div>
+</div>
+<div class="nav-section">
+<div class="nav-section-title" onclick="toggleNavSection(this)">
+<span>搜索</span>
+<span class="nav-arrow">▾</span>
+</div>
+<div class="nav-section-items">
+<div class="search-box">
+<input class="search-input" id="search-input" type="text" placeholder="搜索单词或释义..." oninput="onSearch(this.value)">
+</div>
+<div class="search-result-count" id="search-result-count"></div>
+</div>
+</div>
+<div class="nav-section">
+<div class="nav-section-title" onclick="toggleNavSection(this)">
+<span>字母索引</span>
+<span class="nav-arrow">▾</span>
+</div>
+<div class="nav-section-items" id="letter-nav"></div>
+</div>
+<div class="nav-section">
+<div class="nav-section-title" onclick="toggleNavSection(this)">
+<span>词汇列表</span>
+<span class="nav-arrow">▾</span>
+</div>
+<div class="nav-section-items" id="word-nav"></div>
+</div>
+</nav>
+</aside>
+<main class="content" id="content">
+<div class="home-page" id="home-page">
+<div class="home-intro">
+<h1>CET6 选词填空核心词汇</h1>
+<p>2014–2025年真题 · 830+ 高频词</p>
+<p>本页汇总了2014年至2025年CET6六级选词填空真题中出现的核心词汇，按字母顺序排列，每个词均配有词性标注和中文释义。点击左侧字母索引可快速跳转，点击单词可查看详情。</p>
+</div>
+<div id="mode-toggle-area"></div>
+<div id="study-stats-area"></div>
+<div id="study-modes-area"></div>
+<div class="home-section">
+<h2>字母速查</h2>
+<div class="structure-tags" id="letter-tags"></div>
+</div>
+<div class="home-section">
+<h2>全部词汇</h2>
+<div class="word-list" id="word-list"></div>
+</div>
+</div>
+<div class="word-page" id="word-page" style="display:none"></div>
+<div class="dictation-page" id="dictation-page" style="display:none"></div>
+<div class="choice-page" id="choice-page" style="display:none"></div>
+</main>
+<button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+
+<div class="rail-edge" id="rail-edge"></div>
+<div class="float-rail" id="float-rail">
+    <div class="rail-icon" onclick="location.href='../'" title="阅读主站">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+    </div>
+    <div class="rail-icon" onclick="showNotes()" title="笔记">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    </div>
+    <div class="rail-icon" onclick="showRepo()" title="共享仓库">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+    </div>
+    <div class="rail-icon" onclick="showPomodoroModal()" title="番茄钟">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    </div>
+    <div class="rail-icon" onclick="location.href='../company.html'" title="公司主站">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+</div>
+
+<div class="pomodoro-timer" id="pomodoro-timer" style="display:none" onclick="showPomodoroModal()">
+  <span id="pomodoro-display">25:00</span>
+</div>
+
+<!-- Notes Panel -->
+<div class="notes-panel" id="notes-panel">
+  <div class="notes-header">
+    <button class="notes-close" onclick="closeNotes()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <span class="notes-title">笔记</span>
+    <button class="notes-login-btn" id="notes-login-btn" onclick="loginGitHub()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      <span id="login-btn-text">登录</span>
+    </button>
+  </div>
+  <div class="notes-logged-in" id="notes-logged-in" style="display:none">
+    <img class="notes-avatar" id="notes-avatar" src="" alt="">
+    <span class="notes-username" id="notes-username"></span>
+  </div>
+  <div class="notes-context" id="notes-context" style="display:none">
+    <div class="notes-context-label">选中段落</div>
+    <div class="notes-context-text" id="notes-context-text"></div>
+  </div>
+  <div class="notes-input-wrap" id="notes-input-wrap" style="display:none">
+    <textarea class="notes-input" id="notes-input" placeholder="写下你的笔记..." rows="3"></textarea>
+    <button class="notes-submit" onclick="submitNote()">发布</button>
+  </div>
+  <div class="notes-list" id="notes-list">
+    <div class="notes-empty">Ctrl+双击单词释义添加笔记</div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="pomodoro-modal" style="display:none" onclick="if(event.target===this)closePomodoroModal()">
+  <div class="modal-box pomo-modal">
+    <div class="pomo-clock-wrap">
+      <svg class="pomo-clock" viewBox="0 0 200 200" id="pomo-clock-svg">
+        <circle cx="100" cy="100" r="90" fill="none" stroke="#E9ECEF" stroke-width="2"/>
+        <circle cx="100" cy="100" r="78" fill="none" stroke="#F8F9FA" stroke-width="1"/>
+        <g id="pomo-ticks"></g>
+        <line id="pomo-hand" x1="100" y1="100" x2="100" y2="30" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" transform="rotate(0,100,100)"/>
+        <circle cx="100" cy="100" r="5" fill="var(--accent)"/>
+        <circle cx="100" cy="100" r="2" fill="#fff"/>
+      </svg>
+      <div class="pomo-clock-label" id="pomo-clock-label">25 min</div>
+    </div>
+    <div class="pomodoro-presets">
+      <button class="pomo-preset active" data-min="25" onclick="selectPreset(this,25)">25</button>
+      <button class="pomo-preset" data-min="30" onclick="selectPreset(this,30)">30</button>
+      <button class="pomo-preset" data-min="45" onclick="selectPreset(this,45)">45</button>
+      <button class="pomo-preset" data-min="60" onclick="selectPreset(this,60)">60</button>
+    </div>
+    <div class="pomodoro-actions">
+      <button class="pomo-btn pomo-start" onclick="startPomodoro()">开始</button>
+      <button class="pomo-btn pomo-cancel" onclick="stopPomodoro();closePomodoroModal()">取消</button>
+    </div>
+  </div>
+</div>
+</div>
+<script src="../data.js"></script>
+<script src="data.js"></script>
+<script>
+// 来源检查：必须从阅读主站进入
+(function() {
+  var allowed = document.referrer && document.referrer.indexOf(location.origin) === 0 && /\/$|\/index\.html/.test(document.referrer);
+  var fromReading = sessionStorage.getItem('from_reading');
+  if (!allowed && !fromReading) {
+    location.replace('../');
+  }
+})();
+</script>
+<script src="app.js"></script>
+</body>
+</html>
